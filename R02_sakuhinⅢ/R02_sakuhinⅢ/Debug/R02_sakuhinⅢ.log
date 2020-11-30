@@ -1,1 +1,3 @@
-﻿  R02_sakuhinⅢ.vcxproj -> C:\Users\g19031\Desktop\作品\R02_作品Ⅲ\作品ⅢGitHub\R02_sakuhinⅢ\Debug\R02_sakuhinⅢ.exe
+﻿  maincpp.cpp
+C:\Users\g19031\Desktop\作品\R02_作品Ⅲ\作品ⅢGitHub\R02_sakuhinⅢ\R02_sakuhinⅢ\maincpp.cpp(748,24): warning C4244: '=': 'double' から 'int' への変換です。データが失われる可能性があります。
+  R02_sakuhinⅢ.vcxproj -> C:\Users\g19031\Desktop\作品\R02_作品Ⅲ\作品ⅢGitHub\R02_sakuhinⅢ\Debug\R02_sakuhinⅢ.exe
