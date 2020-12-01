@@ -31,9 +31,7 @@
 
 
 #define IMAGE_BACK_PATH			TEXT(".\\IMAGE\\playBK.png")
-#define IMAGE_PLAYER_PATH		TEXT(".\\IMAGE\\蝶2.png")
-
-
+#define IMAGE_PLAYER_PATH		TEXT(".\\IMAGE\\play.png")
 
 #define IMAGE_TITLE_BK_PATH			TEXT(".\\IMAGE\\haikei1.png")		
 #define IMAGE_TITLE_ROGO_PATH		TEXT(".\\IMAGE\\ROGO2.png")	
@@ -44,11 +42,10 @@
 #define IMAGE_TITLE_START_CNT		1			
 #define IMAGE_TITLE_START_CNT_MAX	30			
 
+#define MUSIC_LOAD_ERR_TITLE TEXT("音楽読み込みエラー")
 
-
-
-
-
+#define MUSIC_BGM_PATH            TEXT(".\\MUSIC\\BGMpaly.mp3")
+#define MUSIC_BGM_TITLE_PATH		TEXT(".\\MUSIC\\BGMSTR.mp3")	
 
 
 #define MOUSE_R_CLICK_TITLE		TEXT("ゲーム中断")
@@ -199,7 +196,7 @@ CHARA player;
 
 
 MUSIC BGM;			
-
+MUSIC BGM_TITLE;
 
 
 
@@ -257,9 +254,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (DxLib_Init() == -1) { return -1; }	//ＤＸライブラリ初期化処理
 
+	int DrawX = 0;
+	int DrawY = 0;
 	
 	if (MY_LOAD_IMAGE() == FALSE) { return -1; }
 
+	if (MY_LOAD_MUSIC() == FALSE) { return -1; }
+
+	//プレイヤーの設定
+	player.CanShot = TRUE;
+	player.ShotReLoadCnt = 0;
+	player.ShotReLoadCntMAX = CHARA_RELOAD_LOW;
 	
 	
 	if (MY_FONT_INSTALL_ONCE() == FALSE) { return -1; }
@@ -281,7 +286,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		MY_ALL_KEYDOWN_UPDATE();				
 
-		/*MY_MOUSE_UPDATE();	*/					
+						
+
+		if (MY_KEY_DOWN(KEY_INPUT_UP) == TRUE) { DrawY--; }
+		if (MY_KEY_DOWN(KEY_INPUT_DOWN) == TRUE) { DrawY++; }
+		if (MY_KEY_DOWN(KEY_INPUT_LEFT) == TRUE) { DrawX--; }
+		if (MY_KEY_DOWN(KEY_INPUT_RIGHT) == TRUE) { DrawX++; }
+
+		
+		DrawFormatString(0, 0, GetColor(255, 255, 255), "DrawX:%d", DrawX);
+		DrawFormatString(0, 20, GetColor(255, 255, 255), "DrawY:%d", DrawY);
+
+
 
 		MY_FPS_UPDATE();	
 
@@ -511,11 +527,21 @@ VOID MY_START(VOID)
 VOID MY_START_PROC(VOID)
 {
 	
+	if (CheckSoundMem(BGM_TITLE.handle) == 0)
+	{
+		
+		ChangeVolumeSoundMem(255 * 50 / 100, BGM_TITLE.handle);	
+		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
+	}
+
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
 	
 
-		
+		if (CheckSoundMem(BGM_TITLE.handle) != 0)
+		{
+			StopSoundMem(BGM_TITLE.handle);
+		}
 
 		GameScene = GAME_SCENE_PLAY;
 	}
@@ -599,10 +625,30 @@ VOID MY_PLAY_PROC(VOID)
 	//スペースキーを押したら、エンドシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 	{
-		GameScene = GAME_SCENE_END;
+		
+
+		if (CheckSoundMem(BGM.handle) != 0)
+		{
+			StopSoundMem(BGM.handle);	//BGMを止める
+		}
+
+		SetMouseDispFlag(TRUE);
+
+GameScene = GAME_SCENE_END;
+return ;
 	}
 
+	if (CheckSoundMem(BGM.handle) == 0)
+	{
+		
+		ChangeVolumeSoundMem(255 * 50 / 100, BGM.handle);	//50%の音量にする
 
+		
+		//DX_PLAYTYPE_NORMAL:　ノーマル再生
+		//DX_PLAYTYPE_BACK  : バックグラウンド再生
+		//DX_PLAYTYPE_LOOP  : ループ再生
+		PlaySoundMem(BGM.handle, DX_PLAYTYPE_LOOP);
+	}
 
 	//プレイヤーの中心位置を設定する
 	//player.CenterX = mouse.Point.x;
@@ -620,6 +666,10 @@ VOID MY_PLAY_PROC(VOID)
 
 	
 
+
+
+
+
 	return;
 }
 
@@ -627,13 +677,6 @@ VOID MY_PLAY_PROC(VOID)
 //プレイ画面の描画
 VOID MY_PLAY_DRAW(VOID)
 {
-	//▽▽▽▽▽ プログラム削除ここから ▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽
-	/*
-	//緑の四角を描画
-	DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(0, 255, 0), TRUE);
-	*/
-	//△△△△△ プログラム削除ここまで △△△△△△△△△△△△△△△△△△△△
-
 	//背景を描画する
 	DrawGraph(ImageBack.x, ImageBack.y, ImageBack.handle, TRUE);
 
@@ -681,6 +724,8 @@ VOID MY_END_PROC(VOID)
 	//エスケープキーを押したら、スタートシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
 	{
+		SetMouseDispFlag(TRUE);
+
 		GameScene = GAME_SCENE_START;
 	}
 
@@ -805,13 +850,42 @@ VOID MY_DELETE_IMAGE(VOID)
 BOOL MY_LOAD_MUSIC(VOID)
 {
 
+	strcpy_s(BGM_TITLE.path, MUSIC_BGM_TITLE_PATH);				//パスの設定
+	BGM_TITLE.handle = LoadSoundMem(BGM_TITLE.path);			//読み込み
+	if (BGM_TITLE.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), MUSIC_BGM_TITLE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	strcpy_s(BGM.path, MUSIC_BGM_PATH);		
+	BGM.handle = LoadSoundMem(BGM.path);	
+	if (BGM.handle == -1)
+	{
+		
+		MessageBox(GetMainWindowHandle(), MUSIC_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	////プレイヤーのショット音
+	//strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);			
+	//player.musicShot.handle = LoadSoundMem(player.musicShot.path);		
+	//if (player.musicShot.handle == -1)
+	//{
+	//	
+	//	MessageBox(GetMainWindowHandle(), MUSIC_PLAYER_SHOT_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+	//	return FALSE;
+	//}
 
 	return TRUE;
 }
 
-//音楽をまとめて削除する関数
+
 VOID MY_DELETE_MUSIC(VOID)
 {
+	DeleteSoundMem(BGM.handle);
+	DeleteSoundMem(BGM_TITLE.handle);
 
 	return;
 }
