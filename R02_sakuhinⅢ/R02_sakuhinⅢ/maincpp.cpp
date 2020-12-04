@@ -51,7 +51,30 @@
 #define MOUSE_R_CLICK_TITLE		TEXT("ゲーム中断")
 #define MOUSE_R_CLICK_CAPTION	TEXT("ゲームを中断し、タイトル画面に戻りますか？")
 
+#define GAME_MAP_TATE_MAX	9	
+#define GAME_MAP_YOKO_MAX	13	
+#define GAME_MAP_KIND_MAX	2	
 
+#define GAME_MAP_PATH			TEXT(".\\IMAGE\\MAP\\map.png")		
+
+#define MAP_DIV_WIDTH		64	
+#define MAP_DIV_HEIGHT		64	
+#define MAP_DIV_TATE		10	
+#define MAP_DIV_YOKO		4	
+#define MAP_DIV_NUM	MAP_DIV_TATE * MAP_DIV_YOKO	
+
+
+#define START_ERR_TITLE		TEXT("スタート位置エラー")
+#define START_ERR_CAPTION	TEXT("スタート位置が決まっていません")
+
+enum GAME_MAP_KIND
+{
+	n = -1,	//(NONE)未定
+	k = 0,	//壁
+	t = 9,	//通路
+	s = 5,	//スタート
+	g = 3	//ゴール
+};
 
 enum GAME_SCENE {
 	GAME_SCENE_START,
@@ -132,7 +155,8 @@ typedef struct STRUCT_CHARA
 	int ShotReLoadCnt;			
 	int ShotReLoadCntMAX;		
 	
-
+	RECT coll;					
+	iPOINT collBeforePt;
 
 
 }CHARA;
@@ -161,7 +185,23 @@ typedef struct STRUCT_IMAGE_BLINK
 
 }IMAGE_BLINK;	
 
+typedef struct STRUCT_MAP_IMAGE
+{
+	char path[PATH_MAX];				
+	int handle[MAP_DIV_NUM];			
+	int kind[MAP_DIV_NUM];				
+	int width;							
+	int height;							
+}MAPCHIP;	//MAP_IMAGE構造体
 
+typedef struct STRUCT_MAP
+{
+	GAME_MAP_KIND kind;			
+	int x;						
+	int y;						
+	int width;					
+	int height;					
+}MAP;
 
 
 
@@ -184,6 +224,9 @@ int GameScene;
 
 
 
+int PlayerX, PlayerY;
+int PlayerGraph;
+
 
 
 IMAGE ImageTitleBK;					
@@ -198,7 +241,30 @@ CHARA player;
 MUSIC BGM;			
 MUSIC BGM_TITLE;
 
+GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
+	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
+		k,k,k,k,k,k,k,k,k,k,k,g,k,	// 0
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 2
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
+		k,t,k,k,k,k,k,k,k,k,k,k,k,	// 4
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 5
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
+		k,k,k,k,k,k,k,k,k,k,k,s,k,	// 8
+};	
 
+
+GAME_MAP_KIND mapDataInit[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+
+
+MAPCHIP mapChip;
+
+
+MAP map[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
+
+
+iPOINT startPt{ -1,-1 };
 
 
 
@@ -250,16 +316,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetWindowStyleMode(GAME_WINDOW_BAR);				
 	SetMainWindowText(TEXT(GAME_WINDOW_NAME));			
 	SetAlwaysRunFlag(TRUE);								
-	SetWindowIconID(IDI_ICON1);							
+	SetWindowIconID(IDI_ICON1);			
+	int Key;
 
 	if (DxLib_Init() == -1) { return -1; }	//ＤＸライブラリ初期化処理
 
 	int DrawX = 0;
 	int DrawY = 0;
+
 	
+
 	if (MY_LOAD_IMAGE() == FALSE) { return -1; }
 
 	if (MY_LOAD_MUSIC() == FALSE) { return -1; }
+
+
+
+
 
 	//プレイヤーの設定
 	player.CanShot = TRUE;
@@ -274,9 +347,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetMouseDispFlag(TRUE);			
 
 	GameScene = GAME_SCENE_START;	
+	
 
-	SetDrawScreen(DX_SCREEN_BACK);	
 
+
+	
+	PlayerGraph = LoadGraph("player.bmp");
+
+	
+	PlayerX = 0;
+	PlayerY = 0;
 	
 	
 	while (TRUE)
@@ -286,16 +366,40 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		MY_ALL_KEYDOWN_UPDATE();				
 
-						
+		if (ProcessMessage() != 0) { break; }
+		if (ClearDrawScreen() != 0) { break; }
 
-		if (MY_KEY_DOWN(KEY_INPUT_UP) == TRUE) { DrawY--; }
-		if (MY_KEY_DOWN(KEY_INPUT_DOWN) == TRUE) { DrawY++; }
-		if (MY_KEY_DOWN(KEY_INPUT_LEFT) == TRUE) { DrawX--; }
-		if (MY_KEY_DOWN(KEY_INPUT_RIGHT) == TRUE) { DrawX++; }
+		MY_ALL_KEYDOWN_UPDATE();
 
+
+
+		//if (MY_KEY_DOWN(KEY_INPUT_UP) == TRUE) { DrawY--; }
+		//if (MY_KEY_DOWN(KEY_INPUT_DOWN) == TRUE) { DrawY++; }
+		//if (MY_KEY_DOWN(KEY_INPUT_LEFT) == TRUE) { DrawX--; }
+		//if (MY_KEY_DOWN(KEY_INPUT_RIGHT) == TRUE) { DrawX++; }
+
+
+		//DrawFormatString(0, 0, GetColor(255, 255, 255), "DrawX:%d", DrawX);
+		//DrawFormatString(0, 20, GetColor(255, 255, 255), "DrawY:%d", DrawY);
+
+
+		Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+
+		//if (Key & PAD_INPUT_UP) DrawY -= 3;
+
+		//
+		//if (Key & PAD_INPUT_DOWN) DrawY+= 3;
+
+	
+		//if (Key & PAD_INPUT_RIGHT) DrawX += 3;
+
+		//
+		//if (Key & PAD_INPUT_LEFT) DrawX -= 3;
+
+	
+		//ClearDrawScreen();
+		//DrawGraph(PlayerX, PlayerY, PlayerGraph, TRUE);
 		
-		DrawFormatString(0, 0, GetColor(255, 255, 255), "DrawX:%d", DrawX);
-		DrawFormatString(0, 20, GetColor(255, 255, 255), "DrawY:%d", DrawY);
 
 
 
@@ -425,7 +529,7 @@ BOOL MY_KEY_DOWN(int KEY_INPUT_)
 }
 
 //キーを押し上げたか、キーコードで判断する
-//int：キーコード：KEY_INPUT_???
+//int：キーコード：KEY_INPUT_
 BOOL MY_KEY_UP(int KEY_INPUT_)
 {
 	if (OldAllKeyState[KEY_INPUT_] >= 1	//直前は押していて
@@ -546,6 +650,8 @@ VOID MY_START_PROC(VOID)
 		GameScene = GAME_SCENE_PLAY;
 	}
 
+
+
 	
 
 	//タイトルロゴを拡大
@@ -606,7 +712,7 @@ VOID MY_START_DRAW(VOID)
 		DrawGraph(ImageTitleSTART.image.x, ImageTitleSTART.image.y, ImageTitleSTART.image.handle, TRUE);
 	}
 
-	DrawString(0, 0, "スタート画面(エンターキーを押して下さい)", GetColor(255, 255, 255));
+	DrawString(0, 0, "スタート画面(ENTERキーを押して下さい)", GetColor(255, 255, 255));
 	return;
 }
 
@@ -623,7 +729,7 @@ VOID MY_PLAY(VOID)
 VOID MY_PLAY_PROC(VOID)
 {
 	//スペースキーを押したら、エンドシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
 	{
 		
 
@@ -650,9 +756,84 @@ return ;
 		PlaySoundMem(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
 
+	
+	if (MY_KEY_DOWN(KEY_INPUT_UP))
+	{
+		player.CenterY -= CHARA_SPEED_MIDI;
+		player.coll.left = player.CenterX - mapChip.width / 2 + 5;
+		player.coll.top = player.CenterY - mapChip.height / 2 + 5;
+		player.coll.right = player.CenterX + mapChip.width / 2 + 5;
+		player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
+
+
+	}
+
+	if (MY_KEY_DOWN(KEY_INPUT_DOWN))
+	{
+		player.CenterY += CHARA_SPEED_MIDI;
+		player.coll.left = player.CenterX - mapChip.width / 2 + 5;
+		player.coll.top = player.CenterY - mapChip.height / 2 + 5;
+		player.coll.right = player.CenterX + mapChip.width / 2 + 5;
+		player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
+
+
+	}
+
+	if (MY_KEY_DOWN(KEY_INPUT_LEFT))
+	{
+		player.CenterX -= CHARA_SPEED_MIDI;
+		player.coll.left = player.CenterX - mapChip.width / 2 + 5;
+		player.coll.top = player.CenterY - mapChip.height / 2 + 5;
+		player.coll.right = player.CenterX + mapChip.width / 2 + 5;
+		player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
+
+
+
+	}
+
+	if (MY_KEY_DOWN(KEY_INPUT_RIGHT))
+	{
+		player.CenterX += CHARA_SPEED_MIDI;
+		player.coll.left = player.CenterX - mapChip.width / 2 + 5;
+		player.coll.top = player.CenterY - mapChip.height / 2 + 5;
+		player.coll.right = player.CenterX + mapChip.width / 2 + 5;
+		player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
+	}
+
+	
+
+
+	//if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+	//{
+
+	//	if (player.CanShot == TRUE)
+	//	{
+
+	//		PlaySoundMem(player.musicShot.handle, DX_PLAYTYPE_BACK);
+	//		player.CanShot = FALSE;
+
+	//		for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+	//		{
+	//			if (player.tama[cnt].IsDraw == FALSE)
+	//			{
+
+	//				player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
+
+
+	//				player.tama[cnt].y = player.image.y;
+
+
+	//				player.tama[cnt].IsDraw = TRUE;
+
+	//				break;
+	//			}
+	//		}
+	//	}
+	//}
 	//プレイヤーの中心位置を設定する
 	//player.CenterX = mouse.Point.x;
 	//player.CenterY = mouse.Point.y;
+
 
 	//プレイヤーの位置に置き換える
 	player.image.x = player.CenterX - player.image.width / 2;
@@ -684,10 +865,10 @@ VOID MY_PLAY_DRAW(VOID)
 
 
 	//プレイヤーを描画する(画像を引き伸ばして描画※処理負荷が高い！多用に注意！)
-	DrawExtendGraph(
-		player.image.x, player.image.y,														//ココから
-		player.image.x + player.image.width * 2, player.image.y + player.image.height * 2,	//ココまで引き伸ばす
-		player.image.handle, TRUE);
+	//DrawExtendGraph(
+	//	player.image.x, player.image.y,														//ココから
+	//	player.image.x + player.image.width * 2, player.image.y + player.image.height * 2,	//ココまで引き伸ばす
+	//	player.image.handle, TRUE);
 
 
 	/*
@@ -699,14 +880,14 @@ VOID MY_PLAY_DRAW(VOID)
 		player.image.handle, TRUE);
 	*/
 
-	/*
-	//プレイヤーのを描画する
+	
+	/*プレイヤーのを描画する*/
 	DrawGraph(player.image.x, player.image.y, player.image.handle, TRUE);
-	*/
+	
 
 
 
-	DrawString(0, 0, "プレイ画面(スペースキーを押して下さい)", GetColor(255, 255, 255));
+	DrawString(0, 0, "プレイ画面(ESCキーを押して下さい)", GetColor(255, 255, 255));
 	return;
 }
 
@@ -721,8 +902,8 @@ VOID MY_END(VOID)
 //エンド画面の処理
 VOID MY_END_PROC(VOID)
 {
-	//エスケープキーを押したら、スタートシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
+	//スペースキーを押したら、スタートシーンへ移動する
+	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 	{
 		SetMouseDispFlag(TRUE);
 
@@ -738,7 +919,7 @@ VOID MY_END_DRAW(VOID)
 
 	DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(0, 0, 255), TRUE);
 
-	DrawString(0, 0, "エンド画面(エスケープキーを押して下さい)", GetColor(255, 255, 255));
+	DrawString(0, 0, "エンド画面(スペースキーを押して下さい)", GetColor(255, 255, 255));
 	return;
 }
 
