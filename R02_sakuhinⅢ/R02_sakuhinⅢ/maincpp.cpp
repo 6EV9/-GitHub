@@ -766,26 +766,49 @@ VOID MY_PLAY_PROC(VOID)
 	}
 	else if (KEY_INPUT_UP)
 	{
-		GAME_HEIGHT / 2;
-		player.CenterY += CHARA_SPEED_MIDI;
+		if (player.CenterY < GAME_HEIGHT / 2)
+		{
+			player.CenterY += CHARA_SPEED_MIDI;
+		}
 	}
 
 	if (MY_KEY_DOWN(KEY_INPUT_DOWN))
 	{
 		player.CenterY += CHARA_SPEED_MIDI;
 	}
-		
+	else if (KEY_INPUT_DOWN)
+	{
+		if (player.CenterY > GAME_HEIGHT / 2)
+		{
+			player.CenterY -= CHARA_SPEED_MIDI;
+		}
+	}
+
+	
 
 
 	if (MY_KEY_DOWN(KEY_INPUT_LEFT))
 	{
 		player.CenterX -= CHARA_SPEED_MIDI;
 	}
+	else if (KEY_INPUT_LEFT)
+		if(player.CenterX < GAME_WIDTH/2)
+		{
+			player.CenterX += CHARA_SPEED_MIDI;
+		}
 
 	if (MY_KEY_DOWN(KEY_INPUT_RIGHT))
 	{
 		player.CenterX += CHARA_SPEED_MIDI;
 	}
+	else if (KEY_INPUT_RIGHT)
+	{
+		if (player.CenterX > GAME_WIDTH / 2)
+		{
+			player.CenterX -= CHARA_SPEED_MIDI;
+		}
+	}
+
 
 	player.coll.left = player.CenterX - mapChip.width / 2 + 5;
 	player.coll.top = player.CenterY - mapChip.height / 2 + 5;
