@@ -51,6 +51,19 @@
 #define MOUSE_R_CLICK_TITLE		TEXT("ゲーム中断")
 #define MOUSE_R_CLICK_CAPTION	TEXT("ゲームを中断し、タイトル画面に戻りますか？")
 
+#define TAMA_CHANGE_MAX 5
+#define TAMA_MAX       16
+
+#define TAMA_RED_PATH  TEXT(".\\IMAGE\\TAMA\\tama.png")
+
+#define TAMA_DIV_WIDTH 16
+#define TAMA_DIV_HEIGHT 16
+
+#define TAMA_DIV_TATE   3
+#define TAMA_DIV_YOKO   1
+
+#define TAMA_DIV_NUM  TAMA_DIV_TATE * TAMA_DIV_YOKO
+
 #define GAME_MAP_TATE_MAX	9	
 #define GAME_MAP_YOKO_MAX	13	
 #define GAME_MAP_KIND_MAX	2	
@@ -95,6 +108,22 @@ enum CHARA_RELOAD {
 };	//キャラクターのリロード
 
 
+typedef struct STRUCT_TAMA
+{
+	char path[PATH_MAX];
+	int handle[TAMA_DIV_NUM];
+	int x;
+	int y;
+	int width;
+	int height;
+	BOOL IsDraw;
+	int nowImageKind;
+	int changeImageCnt;
+	int changeImageCntMAX;
+	int speed;
+}TAMA;
+
+
 typedef struct STRUCT_I_POINT
 {
 	int x = -1;
@@ -104,12 +133,12 @@ typedef struct STRUCT_I_POINT
 
 typedef struct STRUCT_MOUSE
 {
-	int InputValue = 0;	
+	int InputValue = 0;
 	int WheelValue = 0;
-	iPOINT Point;		
-	iPOINT OldPoint;	
-	int OldButton[MOUSE_BUTTON_CODE] = { 0 };	
-	int Button[MOUSE_BUTTON_CODE] = { 0 };	
+	iPOINT Point;
+	iPOINT OldPoint;
+	int OldButton[MOUSE_BUTTON_CODE] = { 0 };
+	int Button[MOUSE_BUTTON_CODE] = { 0 };
 }MOUSE;
 
 
@@ -127,38 +156,38 @@ typedef struct STRUCT_FONT
 
 typedef struct STRUCT_IMAGE
 {
-	char path[PATH_MAX];		
-	int handle;					
-	int x;						
-	int y;						
-	int width;					
-	int height;					
-}IMAGE;	
+	char path[PATH_MAX];
+	int handle;
+	int x;
+	int y;
+	int width;
+	int height;
+}IMAGE;
 
 typedef struct STRUCT_MUSIC
 {
-	char path[PATH_MAX];		
-	int handle;					
-}MUSIC;	
+	char path[PATH_MAX];
+	int handle;
+}MUSIC;
 
 
 typedef struct STRUCT_CHARA
 {
-	IMAGE image;				
-	int speed;					
-	int CenterX;				
-	int CenterY;				
+	IMAGE image;
+	int speed;
+	int CenterX;
+	int CenterY;
 
-	MUSIC musicShot;			
+	MUSIC musicShot;
 
-	BOOL CanShot;				
-	int ShotReLoadCnt;			
-	int ShotReLoadCntMAX;		
-	
-	RECT coll;					
+	BOOL CanShot;
+	int ShotReLoadCnt;
+	int ShotReLoadCntMAX;
+
+	RECT coll;
 	iPOINT collBeforePt;
 
-
+	TAMA tama[TAMA_MAX];
 }CHARA;
 
 
@@ -168,59 +197,60 @@ typedef struct STRUCT_CHARA
 
 typedef struct STRUCT_IMAGE_ROTA
 {
-	IMAGE image;		
-	double angle;		
-	double angleMAX;	
-	double rate;		
-	double rateMAX;		
+	IMAGE image;
+	double angle;
+	double angleMAX;
+	double rate;
+	double rateMAX;
 
-}IMAGE_ROTA;	
+}IMAGE_ROTA;
 
 typedef struct STRUCT_IMAGE_BLINK
 {
-	IMAGE image;		
-	int Cnt;			
-	int CntMAX;			
-	BOOL IsDraw;		
+	IMAGE image;
+	int Cnt;
+	int CntMAX;
+	BOOL IsDraw;
 
-}IMAGE_BLINK;	
+}IMAGE_BLINK;
 
 typedef struct STRUCT_MAP_IMAGE
 {
-	char path[PATH_MAX];				
-	int handle[MAP_DIV_NUM];			
-	int kind[MAP_DIV_NUM];				
-	int width;							
-	int height;							
+	char path[PATH_MAX];
+	int handle[MAP_DIV_NUM];
+	int kind[MAP_DIV_NUM];
+	int width;
+	int height;
 }MAPCHIP;	//MAP_IMAGE構造体
 
 typedef struct STRUCT_MAP
 {
-	GAME_MAP_KIND kind;			
-	int x;						
-	int y;						
-	int width;					
-	int height;					
+	GAME_MAP_KIND kind;
+	int x;
+	int y;
+	int width;
+	int height;
 }MAP;
 
 
 
 
-int StartTimeFps;				
-int CountFps;					
-float CalcFps;					
-int SampleNumFps = GAME_FPS;	
+
+int StartTimeFps;
+int CountFps;
+float CalcFps;
+int SampleNumFps = GAME_FPS;
 
 
-char AllKeyState[256] = { '\0' };			
-char OldAllKeyState[256] = { '\0' };	
+char AllKeyState[256] = { '\0' };
+char OldAllKeyState[256] = { '\0' };
 
 
 //MOUSE mouse;
 
-FONT FontTanu32;	
+FONT FontTanu32;
 
-int GameScene;		
+int GameScene;
 
 
 
@@ -229,16 +259,16 @@ int PlayerGraph;
 
 
 
-IMAGE ImageTitleBK;					
-IMAGE_ROTA ImageTitleROGO;				
-IMAGE_BLINK ImageTitleSTART;			
+IMAGE ImageTitleBK;
+IMAGE_ROTA ImageTitleROGO;
+IMAGE_BLINK ImageTitleSTART;
 
 
 IMAGE ImageBack;
-CHARA player;		
+CHARA player;
 
 
-MUSIC BGM;			
+MUSIC BGM;
 MUSIC BGM_TITLE;
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
@@ -252,7 +282,7 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
 		k,k,k,k,k,k,k,k,k,k,k,s,k,	// 8
-};	
+};
 
 
 GAME_MAP_KIND mapDataInit[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
@@ -268,9 +298,9 @@ iPOINT startPt{ -1,-1 };
 
 
 
-VOID MY_FPS_UPDATE(VOID);			
-VOID MY_FPS_DRAW(VOID);			
-VOID MY_FPS_WAIT(VOID);				
+VOID MY_FPS_UPDATE(VOID);
+VOID MY_FPS_DRAW(VOID);
+VOID MY_FPS_WAIT(VOID);
 
 VOID MY_ALL_KEYDOWN_UPDATE(VOID);	//キーの入力状態を更新する
 BOOL MY_KEY_DOWN(int);				//キーを押しているか、キーコードで判断する
@@ -282,41 +312,41 @@ BOOL MY_KEYDOWN_KEEP(int, int);		//キーを押し続けているか、キーコードで判断する
 //BOOL MY_MOUSE_UP(int);				//ボタンを押し上げたか、マウスコードで判断する
 //BOOL MY_MOUSEDOWN_KEEP(int, int);	//ボタンを押し続けているか、マウスコードで判断する
 
-BOOL MY_FONT_INSTALL_ONCE(VOID);	
+BOOL MY_FONT_INSTALL_ONCE(VOID);
 VOID MY_FONT_UNINSTALL_ONCE(VOID);
-BOOL MY_FONT_CREATE(VOID);			
-VOID MY_FONT_DELETE(VOID);			
+BOOL MY_FONT_CREATE(VOID);
+VOID MY_FONT_DELETE(VOID);
 
-VOID MY_START(VOID);		
+VOID MY_START(VOID);
 VOID MY_START_PROC(VOID);	//スタート画面の処理
 VOID MY_START_DRAW(VOID);	//スタート画面の描画
 
-VOID MY_PLAY(VOID);			
+VOID MY_PLAY(VOID);
 VOID MY_PLAY_PROC(VOID);	//プレイ画面の処理
 VOID MY_PLAY_DRAW(VOID);	//プレイ画面の描画
 
-VOID MY_END(VOID);			
+VOID MY_END(VOID);
 VOID MY_END_PROC(VOID);		//エンド画面の処理
 VOID MY_END_DRAW(VOID);		//エンド画面の描画
 
-BOOL MY_LOAD_IMAGE(VOID);		
-VOID MY_DELETE_IMAGE(VOID);		
+BOOL MY_LOAD_IMAGE(VOID);
+VOID MY_DELETE_IMAGE(VOID);
 
-BOOL MY_LOAD_MUSIC(VOID);		
-VOID MY_DELETE_MUSIC(VOID);		
+BOOL MY_LOAD_MUSIC(VOID);
+VOID MY_DELETE_MUSIC(VOID);
 
-BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);	
-BOOL MY_CHECK_RECT_COLL(RECT, RECT);	
+BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);
+BOOL MY_CHECK_RECT_COLL(RECT, RECT);
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	ChangeWindowMode(TRUE);								
-	SetGraphMode(GAME_WIDTH, GAME_HEIGHT, GAME_COLOR);	
-	SetWindowStyleMode(GAME_WINDOW_BAR);				
-	SetMainWindowText(TEXT(GAME_WINDOW_NAME));			
-	SetAlwaysRunFlag(TRUE);								
-	SetWindowIconID(IDI_ICON1);			
+	ChangeWindowMode(TRUE);
+	SetGraphMode(GAME_WIDTH, GAME_HEIGHT, GAME_COLOR);
+	SetWindowStyleMode(GAME_WINDOW_BAR);
+	SetMainWindowText(TEXT(GAME_WINDOW_NAME));
+	SetAlwaysRunFlag(TRUE);
+	SetWindowIconID(IDI_ICON1);
 	int Key;
 
 	if (DxLib_Init() == -1) { return -1; }	//ＤＸライブラリ初期化処理
@@ -324,7 +354,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	int DrawX = 0;
 	int DrawY = 0;
 
-	
+
 
 	if (MY_LOAD_IMAGE() == FALSE) { return -1; }
 
@@ -338,33 +368,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	player.CanShot = TRUE;
 	player.ShotReLoadCnt = 0;
 	player.ShotReLoadCntMAX = CHARA_RELOAD_LOW;
-	
-	
+
+
 	if (MY_FONT_INSTALL_ONCE() == FALSE) { return -1; }
 	//フォントハンドルを作成
 	if (MY_FONT_CREATE() == FALSE) { return -1; }
 
-	SetMouseDispFlag(TRUE);			
+	SetMouseDispFlag(TRUE);
 
-	GameScene = GAME_SCENE_START;	
-	
-
+	GameScene = GAME_SCENE_START;
 
 
-	
-	PlayerGraph = LoadGraph("player.bmp");
 
-	
 	PlayerX = 0;
 	PlayerY = 0;
-	
-	
+
+	SetDrawScreen(DX_SCREEN_BACK);	//Draw系関数は裏画面に描画
+
 	while (TRUE)
 	{
-		if (ProcessMessage() != 0) { break; }	
-		if (ClearDrawScreen() != 0) { break; }	
+		if (ProcessMessage() != 0) { break; }
+		if (ClearDrawScreen() != 0) { break; }
 
-		MY_ALL_KEYDOWN_UPDATE();				
+		MY_ALL_KEYDOWN_UPDATE();
 
 		if (ProcessMessage() != 0) { break; }
 		if (ClearDrawScreen() != 0) { break; }
@@ -373,39 +399,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 
-		//if (MY_KEY_DOWN(KEY_INPUT_UP) == TRUE) { DrawY--; }
-		//if (MY_KEY_DOWN(KEY_INPUT_DOWN) == TRUE) { DrawY++; }
-		//if (MY_KEY_DOWN(KEY_INPUT_LEFT) == TRUE) { DrawX--; }
-		//if (MY_KEY_DOWN(KEY_INPUT_RIGHT) == TRUE) { DrawX++; }
-
-
-		//DrawFormatString(0, 0, GetColor(255, 255, 255), "DrawX:%d", DrawX);
-		//DrawFormatString(0, 20, GetColor(255, 255, 255), "DrawY:%d", DrawY);
-
-
-		Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-
-		//if (Key & PAD_INPUT_UP) DrawY -= 3;
-
-		//
-		//if (Key & PAD_INPUT_DOWN) DrawY+= 3;
-
-	
-		//if (Key & PAD_INPUT_RIGHT) DrawX += 3;
-
-		//
-		//if (Key & PAD_INPUT_LEFT) DrawX -= 3;
-
-	
-		//ClearDrawScreen();
-		//DrawGraph(PlayerX, PlayerY, PlayerGraph, TRUE);
-		
 
 
 
-		MY_FPS_UPDATE();	
 
-		
+
+
+
+		MY_FPS_UPDATE();
+
+
 		switch (GameScene)
 		{
 		case GAME_SCENE_START:
@@ -415,27 +418,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			MY_PLAY();
 			break;
 		case GAME_SCENE_END:
-			MY_END();	
+			MY_END();
 			break;
 		}
 
-		MY_FPS_DRAW();		
+		MY_FPS_DRAW();
 
-		ScreenFlip();		
+		ScreenFlip();
 
-		MY_FPS_WAIT();		
+		MY_FPS_WAIT();
 	}
 
 
 	MY_FONT_DELETE();
 
-	
+
 	MY_FONT_UNINSTALL_ONCE();
 
 
 	MY_DELETE_IMAGE();
 
-	
+
 	MY_DELETE_MUSIC();
 
 	DxLib_End();
@@ -446,7 +449,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 VOID MY_FPS_UPDATE(VOID)
 {
-	if (CountFps == 0) 
+	if (CountFps == 0)
 	{
 		StartTimeFps = GetNowCount();
 	}
@@ -454,7 +457,7 @@ VOID MY_FPS_UPDATE(VOID)
 	if (CountFps == SampleNumFps) //60フレーム目なら平均を計算
 	{
 		int now = GetNowCount();
-	
+
 		CalcFps = 1000.f / ((now - StartTimeFps) / (float)SampleNumFps);
 		CountFps = 0;
 		StartTimeFps = now;
@@ -466,7 +469,7 @@ VOID MY_FPS_UPDATE(VOID)
 
 VOID MY_FPS_DRAW(VOID)
 {
-	
+
 	DrawFormatString(0, GAME_HEIGHT - 20, GetColor(255, 255, 255), "FPS:%.1f", CalcFps);
 	return;
 }
@@ -548,7 +551,7 @@ BOOL MY_KEY_UP(int KEY_INPUT_)
 
 BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
 {
-	
+
 	int UpdateTime = DownTime * GAME_FPS;
 
 	if (AllKeyState[KEY_INPUT_] > UpdateTime)
@@ -566,10 +569,10 @@ BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
 
 BOOL MY_FONT_INSTALL_ONCE(VOID)
 {
-	
+
 	if (AddFontResourceEx(FONT_TANU_PATH, FR_PRIVATE, NULL) == 0)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), FONT_TANU_NAME, FONT_INSTALL_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
@@ -580,7 +583,7 @@ BOOL MY_FONT_INSTALL_ONCE(VOID)
 
 VOID MY_FONT_UNINSTALL_ONCE(VOID)
 {
-	
+
 	RemoveFontResourceEx(FONT_TANU_PATH, FR_PRIVATE, NULL);
 
 	return;
@@ -589,22 +592,22 @@ VOID MY_FONT_UNINSTALL_ONCE(VOID)
 
 BOOL MY_FONT_CREATE(VOID)
 {
-	
 
-	
+
+
 	strcpy_s(FontTanu32.path, sizeof(FontTanu32.path), FONT_TANU_PATH);
-	strcpy_s(FontTanu32.name, sizeof(FontTanu32.name), FONT_TANU_NAME);	
-	FontTanu32.handle = -1;								
-	FontTanu32.size = 32;								
-	FontTanu32.bold = 1;								
-	FontTanu32.type = DX_FONTTYPE_ANTIALIASING_EDGE;	
+	strcpy_s(FontTanu32.name, sizeof(FontTanu32.name), FONT_TANU_NAME);
+	FontTanu32.handle = -1;
+	FontTanu32.size = 32;
+	FontTanu32.bold = 1;
+	FontTanu32.type = DX_FONTTYPE_ANTIALIASING_EDGE;
 
-	
+
 	FontTanu32.handle = CreateFontToHandle(FontTanu32.name, FontTanu32.size, FontTanu32.bold, FontTanu32.type);
-	
+
 	if (FontTanu32.handle == -1) { MessageBox(GetMainWindowHandle(), FONT_TANU_NAME, FONT_CREATE_ERR_TITLE, MB_OK); return FALSE; }
 
-	
+
 
 	return TRUE;
 }
@@ -613,7 +616,7 @@ BOOL MY_FONT_CREATE(VOID)
 VOID MY_FONT_DELETE(VOID)
 {
 
-	DeleteFontToHandle(FontTanu32.handle);	
+	DeleteFontToHandle(FontTanu32.handle);
 
 	return;
 }
@@ -630,17 +633,17 @@ VOID MY_START(VOID)
 //スタート画面の処理
 VOID MY_START_PROC(VOID)
 {
-	
+
 	if (CheckSoundMem(BGM_TITLE.handle) == 0)
 	{
-		
-		ChangeVolumeSoundMem(255 * 50 / 100, BGM_TITLE.handle);	
+
+		ChangeVolumeSoundMem(255 * 50 / 100, BGM_TITLE.handle);
 		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
 	}
 
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
-	
+
 
 		if (CheckSoundMem(BGM_TITLE.handle) != 0)
 		{
@@ -652,7 +655,7 @@ VOID MY_START_PROC(VOID)
 
 
 
-	
+
 
 	//タイトルロゴを拡大
 	if (ImageTitleROGO.rate < ImageTitleROGO.rateMAX)
@@ -698,7 +701,7 @@ VOID MY_START_DRAW(VOID)
 {
 	DrawGraph(ImageTitleBK.x, ImageTitleBK.y, ImageTitleBK.handle, TRUE);	//タイトル背景の描画
 
-	
+
 	DrawRotaGraph(
 		ImageTitleROGO.image.x, ImageTitleROGO.image.y,	//画像の座標
 		ImageTitleROGO.rate,							//画像の拡大率
@@ -731,7 +734,7 @@ VOID MY_PLAY_PROC(VOID)
 	//スペースキーを押したら、エンドシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
 	{
-		
+
 
 		if (CheckSoundMem(BGM.handle) != 0)
 		{
@@ -740,67 +743,54 @@ VOID MY_PLAY_PROC(VOID)
 
 		SetMouseDispFlag(TRUE);
 
-GameScene = GAME_SCENE_END;
-return ;
+		GameScene = GAME_SCENE_END;
+		return;
 	}
 
 	if (CheckSoundMem(BGM.handle) == 0)
 	{
-		
+
 		ChangeVolumeSoundMem(255 * 50 / 100, BGM.handle);	//50%の音量にする
 
-		
+
 		//DX_PLAYTYPE_NORMAL:　ノーマル再生
 		//DX_PLAYTYPE_BACK  : バックグラウンド再生
 		//DX_PLAYTYPE_LOOP  : ループ再生
 		PlaySoundMem(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
 
-	
+
 	if (MY_KEY_DOWN(KEY_INPUT_UP))
 	{
 		player.CenterY -= CHARA_SPEED_MIDI;
-		player.coll.left = player.CenterX - mapChip.width / 2 + 5;
-		player.coll.top = player.CenterY - mapChip.height / 2 + 5;
-		player.coll.right = player.CenterX + mapChip.width / 2 + 5;
-		player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
-
-
+	}
+	else if (KEY_INPUT_UP)
+	{
+		GAME_HEIGHT / 2;
+		player.CenterY += CHARA_SPEED_MIDI;
 	}
 
 	if (MY_KEY_DOWN(KEY_INPUT_DOWN))
 	{
 		player.CenterY += CHARA_SPEED_MIDI;
-		player.coll.left = player.CenterX - mapChip.width / 2 + 5;
-		player.coll.top = player.CenterY - mapChip.height / 2 + 5;
-		player.coll.right = player.CenterX + mapChip.width / 2 + 5;
-		player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
-
-
 	}
+		
+
 
 	if (MY_KEY_DOWN(KEY_INPUT_LEFT))
 	{
 		player.CenterX -= CHARA_SPEED_MIDI;
-		player.coll.left = player.CenterX - mapChip.width / 2 + 5;
-		player.coll.top = player.CenterY - mapChip.height / 2 + 5;
-		player.coll.right = player.CenterX + mapChip.width / 2 + 5;
-		player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
-
-
-
 	}
 
 	if (MY_KEY_DOWN(KEY_INPUT_RIGHT))
 	{
 		player.CenterX += CHARA_SPEED_MIDI;
-		player.coll.left = player.CenterX - mapChip.width / 2 + 5;
-		player.coll.top = player.CenterY - mapChip.height / 2 + 5;
-		player.coll.right = player.CenterX + mapChip.width / 2 + 5;
-		player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
 	}
 
-	
+	player.coll.left = player.CenterX - mapChip.width / 2 + 5;
+	player.coll.top = player.CenterY - mapChip.height / 2 + 5;
+	player.coll.right = player.CenterX + mapChip.width / 2 + 5;
+	player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
 
 
 	//if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
@@ -829,7 +819,20 @@ return ;
 	//			}
 	//		}
 	//	}
-	//}
+	//}]
+
+	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+	{
+		if (player.tama[cnt].IsDraw == FALSE)
+		{
+			player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
+
+			player.tama[cnt].y = player.image.y;
+
+			player.tama[cnt].IsDraw = TRUE;
+		}
+	}
+
 	//プレイヤーの中心位置を設定する
 	//player.CenterX = mouse.Point.x;
 	//player.CenterY = mouse.Point.y;
@@ -845,7 +848,7 @@ return ;
 	if (player.image.y < 0) { player.image.y = 0; }
 	if (player.image.y + player.image.height > GAME_HEIGHT) { player.image.y = GAME_HEIGHT - player.image.height; }
 
-	
+
 
 
 
@@ -858,10 +861,51 @@ return ;
 //プレイ画面の描画
 VOID MY_PLAY_DRAW(VOID)
 {
-	//背景を描画する
-	DrawGraph(ImageBack.x, ImageBack.y, ImageBack.handle, TRUE);
 
-	
+	DrawGraph(ImageBack.x, ImageBack.y, ImageBack.handle, TRUE);
+	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+	{
+
+		if (player.tama[cnt].IsDraw == TRUE)
+		{
+
+			DrawGraph(
+				player.tama[cnt].x,
+				player.tama[cnt].y,
+				player.tama[cnt].handle[player.tama[cnt].nowImageKind],
+				TRUE);
+
+
+			if (player.tama[cnt].changeImageCnt < player.tama[cnt].changeImageCntMAX)
+			{
+				player.tama[cnt].changeImageCnt++;
+			}
+			else
+			{
+				if (player.tama[cnt].nowImageKind < TAMA_DIV_NUM - 1)
+				{
+					player.tama[cnt].nowImageKind++;
+				}
+				else
+				{
+					player.tama[cnt].nowImageKind = 0;
+				}
+
+				player.tama[cnt].changeImageCnt = 0;
+			}
+
+
+			if (player.tama[cnt].y < 0)
+			{
+				player.tama[cnt].IsDraw = FALSE;
+			}
+			else
+			{
+				player.tama[cnt].y -= player.tama[cnt].speed;
+			}
+		}
+	}
+
 
 
 	//プレイヤーを描画する(画像を引き伸ばして描画※処理負荷が高い！多用に注意！)
@@ -880,10 +924,10 @@ VOID MY_PLAY_DRAW(VOID)
 		player.image.handle, TRUE);
 	*/
 
-	
+
 	/*プレイヤーのを描画する*/
 	DrawGraph(player.image.x, player.image.y, player.image.handle, TRUE);
-	
+
 
 
 
@@ -927,11 +971,11 @@ VOID MY_END_DRAW(VOID)
 BOOL MY_LOAD_IMAGE(VOID)
 {
 
-	
+
 
 	//タイトル背景
-	strcpy_s(ImageTitleBK.path, IMAGE_TITLE_BK_PATH);			
-	ImageTitleBK.handle = LoadGraph(ImageTitleBK.path);			
+	strcpy_s(ImageTitleBK.path, IMAGE_TITLE_BK_PATH);
+	ImageTitleBK.handle = LoadGraph(ImageTitleBK.path);
 	if (ImageTitleBK.handle == -1)
 	{
 		//エラーメッセージ表示
@@ -943,8 +987,8 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleBK.y = GAME_HEIGHT / 2 - ImageTitleBK.height / 2;		//上下中央揃え
 
 	//タイトルロゴ
-	strcpy_s(ImageTitleROGO.image.path, IMAGE_TITLE_ROGO_PATH);					
-	ImageTitleROGO.image.handle = LoadGraph(ImageTitleROGO.image.path);			
+	strcpy_s(ImageTitleROGO.image.path, IMAGE_TITLE_ROGO_PATH);
+	ImageTitleROGO.image.handle = LoadGraph(ImageTitleROGO.image.path);
 	if (ImageTitleROGO.image.handle == -1)
 	{
 		//エラーメッセージ表示
@@ -960,8 +1004,8 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleROGO.rateMAX = IMAGE_TITLE_ROGO_ROTA_MAX;		//拡大率MAX
 
 	//タイトルスタート
-	strcpy_s(ImageTitleSTART.image.path, IMAGE_TITLE_START_PATH);					
-	ImageTitleSTART.image.handle = LoadGraph(ImageTitleSTART.image.path);			
+	strcpy_s(ImageTitleSTART.image.path, IMAGE_TITLE_START_PATH);
+	ImageTitleSTART.image.handle = LoadGraph(ImageTitleSTART.image.path);
 	if (ImageTitleSTART.image.handle == -1)
 	{
 		//エラーメッセージ表示
@@ -975,7 +1019,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleSTART.CntMAX = IMAGE_TITLE_START_CNT_MAX;		//カウンタMAX
 	ImageTitleSTART.IsDraw = FALSE;							//描画させない
 
-	
+
 	strcpy_s(ImageBack.path, IMAGE_BACK_PATH);		//パスの設定
 	ImageBack.handle = LoadGraph(ImageBack.path);	//読み込み
 	if (ImageBack.handle == -1)
@@ -987,13 +1031,13 @@ BOOL MY_LOAD_IMAGE(VOID)
 	GetGraphSize(ImageBack.handle, &ImageBack.width, &ImageBack.height);	//画像の幅と高さを取得
 	ImageBack.x = GAME_WIDTH / 2 - ImageBack.width / 2;		//左右中央揃え
 	ImageBack.y = GAME_HEIGHT / 2 - ImageBack.height / 2;
-	
+
 	//プレイヤーの画像
-	strcpy_s(player.image.path, IMAGE_PLAYER_PATH);		
-	player.image.handle = LoadGraph(player.image.path);	
+	strcpy_s(player.image.path, IMAGE_PLAYER_PATH);
+	player.image.handle = LoadGraph(player.image.path);
 	if (player.image.handle == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), IMAGE_PLAYER_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
@@ -1004,7 +1048,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	player.CenterY = player.image.y + player.image.height / 2;		//画像の縦の中心を探す
 	player.speed = CHARA_SPEED_LOW;									//スピードを設定
 
-	
+
 
 	return TRUE;
 }
@@ -1021,9 +1065,9 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(ImageTitleROGO.image.handle);
 	DeleteGraph(ImageTitleSTART.image.handle);
 
-	
 
-	
+
+
 	return;
 }
 
@@ -1040,11 +1084,11 @@ BOOL MY_LOAD_MUSIC(VOID)
 		return FALSE;
 	}
 
-	strcpy_s(BGM.path, MUSIC_BGM_PATH);		
-	BGM.handle = LoadSoundMem(BGM.path);	
+	strcpy_s(BGM.path, MUSIC_BGM_PATH);
+	BGM.handle = LoadSoundMem(BGM.path);
 	if (BGM.handle == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), MUSIC_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
