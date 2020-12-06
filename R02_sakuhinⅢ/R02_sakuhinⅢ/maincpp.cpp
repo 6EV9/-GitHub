@@ -54,7 +54,7 @@
 #define TAMA_CHANGE_MAX 5
 #define TAMA_MAX       16
 
-#define TAMA_RED_PATH  TEXT(".\\IMAGE\\TAMA\\tama.png")
+#define TAMA_RED_PATH  TEXT(".\\IMAGE\\tama.png")
 
 #define TAMA_DIV_WIDTH 16
 #define TAMA_DIV_HEIGHT 16
@@ -110,17 +110,17 @@ enum CHARA_RELOAD {
 
 typedef struct STRUCT_TAMA
 {
-	char path[PATH_MAX];
-	int handle[TAMA_DIV_NUM];
-	int x;
-	int y;
-	int width;
-	int height;
-	BOOL IsDraw;
-	int nowImageKind;
-	int changeImageCnt;
-	int changeImageCntMAX;
-	int speed;
+	char path[PATH_MAX];				
+	int handle[TAMA_DIV_NUM];			
+	int x;								
+	int y;								
+	int width;							
+	int height;							
+	BOOL IsDraw;						
+	int nowImageKind;					
+	int changeImageCnt;					
+	int changeImageCntMAX;				
+	int speed;							
 }TAMA;
 
 
@@ -672,14 +672,14 @@ VOID MY_START_PROC(VOID)
 	{
 		//タイトルロゴが移動しきったら
 
-		//スタートを点滅
+		
 		if (ImageTitleSTART.Cnt < ImageTitleSTART.CntMAX)
 		{
 			ImageTitleSTART.Cnt += IMAGE_TITLE_START_CNT;
 		}
 		else
 		{
-			//描画する/しないを決める
+		
 			if (ImageTitleSTART.IsDraw == FALSE)
 			{
 				ImageTitleSTART.IsDraw = TRUE;
@@ -703,10 +703,10 @@ VOID MY_START_DRAW(VOID)
 
 
 	DrawRotaGraph(
-		ImageTitleROGO.image.x, ImageTitleROGO.image.y,	//画像の座標
-		ImageTitleROGO.rate,							//画像の拡大率
-		ImageTitleROGO.angle,							//画像の回転率
-		ImageTitleROGO.image.handle, TRUE);				//画像のハンドル
+		ImageTitleROGO.image.x, ImageTitleROGO.image.y,	
+		ImageTitleROGO.rate,							
+		ImageTitleROGO.angle,							
+		ImageTitleROGO.image.handle, TRUE);				
 
 	//点滅
 	if (ImageTitleSTART.IsDraw == TRUE)
@@ -756,7 +756,8 @@ VOID MY_PLAY_PROC(VOID)
 		//DX_PLAYTYPE_NORMAL:　ノーマル再生
 		//DX_PLAYTYPE_BACK  : バックグラウンド再生
 		//DX_PLAYTYPE_LOOP  : ループ再生
-		PlaySoundMem(BGM.handle, DX_PLAYTYPE_LOOP);
+		
+		(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
 
 
@@ -816,56 +817,56 @@ VOID MY_PLAY_PROC(VOID)
 	player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
 
 
-	//if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
-	//{
-
-	//	if (player.CanShot == TRUE)
-	//	{
-
-	//		PlaySoundMem(player.musicShot.handle, DX_PLAYTYPE_BACK);
-	//		player.CanShot = FALSE;
-
-	//		for (int cnt = 0; cnt < TAMA_MAX; cnt++)
-	//		{
-	//			if (player.tama[cnt].IsDraw == FALSE)
-	//			{
-
-	//				player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
-
-
-	//				player.tama[cnt].y = player.image.y;
-
-
-	//				player.tama[cnt].IsDraw = TRUE;
-
-	//				break;
-	//			}
-	//		}
-	//	}
-	//}]
-
-	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 	{
-		if (player.tama[cnt].IsDraw == FALSE)
+
+		if (player.CanShot == TRUE)
 		{
-			player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
 
-			player.tama[cnt].y = player.image.y;
+			PlaySoundMem(player.musicShot.handle, DX_PLAYTYPE_BACK);
+			player.CanShot = FALSE;
 
-			player.tama[cnt].IsDraw = TRUE;
+			for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+			{
+				if (player.tama[cnt].IsDraw == FALSE)
+				{
+
+					player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
+
+
+					player.tama[cnt].y = player.image.y;
+
+
+					player.tama[cnt].IsDraw = TRUE;
+
+					break;
+				}
+			}
 		}
 	}
 
-	//プレイヤーの中心位置を設定する
+	//for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+	//{
+	//	if (player.tama[cnt].IsDraw == FALSE)
+	//	{
+	//		player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
+
+	//		player.tama[cnt].y = player.image.y;
+
+	//		player.tama[cnt].IsDraw = TRUE;
+	//	}
+	//}
+
+	
 	//player.CenterX = mouse.Point.x;
 	//player.CenterY = mouse.Point.y;
 
 
-	//プレイヤーの位置に置き換える
+	
 	player.image.x = player.CenterX - player.image.width / 2;
 	player.image.y = player.CenterY - player.image.height / 2;
 
-	//画面外にプレイヤーが行かないようにする
+	
 	if (player.image.x < 0) { player.image.x = 0; }
 	if (player.image.x + player.image.width > GAME_WIDTH) { player.image.x = GAME_WIDTH - player.image.width; }
 	if (player.image.y < 0) { player.image.y = 0; }
@@ -886,41 +887,43 @@ VOID MY_PLAY_DRAW(VOID)
 {
 
 	DrawGraph(ImageBack.x, ImageBack.y, ImageBack.handle, TRUE);
+	
 	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
 	{
-
+		
 		if (player.tama[cnt].IsDraw == TRUE)
 		{
-
+			
 			DrawGraph(
 				player.tama[cnt].x,
 				player.tama[cnt].y,
-				player.tama[cnt].handle[player.tama[cnt].nowImageKind],
+				player.tama[cnt].handle[player.tama[cnt].nowImageKind],	//現在の画像の種類にあったハンドル
 				TRUE);
 
-
+			
 			if (player.tama[cnt].changeImageCnt < player.tama[cnt].changeImageCntMAX)
 			{
 				player.tama[cnt].changeImageCnt++;
 			}
 			else
 			{
-				if (player.tama[cnt].nowImageKind < TAMA_DIV_NUM - 1)
+				
+				if (player.tama[cnt].nowImageKind < TAMA_DIV_NUM - 1)	
 				{
-					player.tama[cnt].nowImageKind++;
+					player.tama[cnt].nowImageKind++;	
 				}
 				else
 				{
-					player.tama[cnt].nowImageKind = 0;
+					player.tama[cnt].nowImageKind = 0;	
 				}
 
 				player.tama[cnt].changeImageCnt = 0;
 			}
 
-
+			
 			if (player.tama[cnt].y < 0)
 			{
-				player.tama[cnt].IsDraw = FALSE;
+				player.tama[cnt].IsDraw = FALSE;	
 			}
 			else
 			{
@@ -928,7 +931,6 @@ VOID MY_PLAY_DRAW(VOID)
 			}
 		}
 	}
-
 
 
 	//プレイヤーを描画する(画像を引き伸ばして描画※処理負荷が高い！多用に注意！)
@@ -948,7 +950,7 @@ VOID MY_PLAY_DRAW(VOID)
 	*/
 
 
-	/*プレイヤーのを描画する*/
+	
 	DrawGraph(player.image.x, player.image.y, player.image.handle, TRUE);
 
 
@@ -958,18 +960,18 @@ VOID MY_PLAY_DRAW(VOID)
 	return;
 }
 
-//エンド画面
+
 VOID MY_END(VOID)
 {
-	MY_END_PROC();	//エンド画面の処理
-	MY_END_DRAW();	//エンド画面の描画
+	MY_END_PROC();	
+	MY_END_DRAW();	
 	return;
 }
 
-//エンド画面の処理
+
 VOID MY_END_PROC(VOID)
 {
-	//スペースキーを押したら、スタートシーンへ移動する
+	
 	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 	{
 		SetMouseDispFlag(TRUE);
@@ -980,7 +982,7 @@ VOID MY_END_PROC(VOID)
 	return;
 }
 
-//エンド画面の描画
+
 VOID MY_END_DRAW(VOID)
 {
 
@@ -996,66 +998,66 @@ BOOL MY_LOAD_IMAGE(VOID)
 
 
 
-	//タイトル背景
+
 	strcpy_s(ImageTitleBK.path, IMAGE_TITLE_BK_PATH);
 	ImageTitleBK.handle = LoadGraph(ImageTitleBK.path);
 	if (ImageTitleBK.handle == -1)
 	{
-		//エラーメッセージ表示
+		
 		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_BK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageTitleBK.handle, &ImageTitleBK.width, &ImageTitleBK.height);	//画像の幅と高さを取得
-	ImageTitleBK.x = GAME_WIDTH / 2 - ImageTitleBK.width / 2;		//左右中央揃え
-	ImageTitleBK.y = GAME_HEIGHT / 2 - ImageTitleBK.height / 2;		//上下中央揃え
+	GetGraphSize(ImageTitleBK.handle, &ImageTitleBK.width, &ImageTitleBK.height);	
+	ImageTitleBK.x = GAME_WIDTH / 2 - ImageTitleBK.width / 2;		
+	ImageTitleBK.y = GAME_HEIGHT / 2 - ImageTitleBK.height / 2;		
 
-	//タイトルロゴ
+	
 	strcpy_s(ImageTitleROGO.image.path, IMAGE_TITLE_ROGO_PATH);
 	ImageTitleROGO.image.handle = LoadGraph(ImageTitleROGO.image.path);
 	if (ImageTitleROGO.image.handle == -1)
 	{
-		//エラーメッセージ表示
+		
 		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_ROGO_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageTitleROGO.image.handle, &ImageTitleROGO.image.width, &ImageTitleROGO.image.height);	//画像の幅と高さを取得
-	ImageTitleROGO.image.x = 230;							//光っている部分から描画したい
-	ImageTitleROGO.image.y = GAME_HEIGHT / 2;				//中央寄せ
-	ImageTitleROGO.angle = DX_PI * 2;						//回転率
-	ImageTitleROGO.angleMAX = DX_PI * 2;					//回転率MAX
-	ImageTitleROGO.rate = 0.0;								//拡大率
-	ImageTitleROGO.rateMAX = IMAGE_TITLE_ROGO_ROTA_MAX;		//拡大率MAX
+	GetGraphSize(ImageTitleROGO.image.handle, &ImageTitleROGO.image.width, &ImageTitleROGO.image.height);	
+	ImageTitleROGO.image.x = 230;							
+	ImageTitleROGO.image.y = GAME_HEIGHT / 2;				
+	ImageTitleROGO.angle = DX_PI * 2;						
+	ImageTitleROGO.angleMAX = DX_PI * 2;					
+	ImageTitleROGO.rate = 0.0;								
+	ImageTitleROGO.rateMAX = IMAGE_TITLE_ROGO_ROTA_MAX;		
 
-	//タイトルスタート
+	
 	strcpy_s(ImageTitleSTART.image.path, IMAGE_TITLE_START_PATH);
 	ImageTitleSTART.image.handle = LoadGraph(ImageTitleSTART.image.path);
 	if (ImageTitleSTART.image.handle == -1)
 	{
-		//エラーメッセージ表示
+	
 		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_START_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageTitleSTART.image.handle, &ImageTitleSTART.image.width, &ImageTitleSTART.image.height);	//画像の幅と高さを取得
-	ImageTitleSTART.image.x = GAME_WIDTH / 2 - ImageTitleSTART.image.width / 2;					//左右中央揃え
-	ImageTitleSTART.image.y = ImageTitleROGO.image.y + ImageTitleROGO.image.height / 2 + 10;	//ロゴの下に表示
-	ImageTitleSTART.Cnt = 0.0;								//カウンタ
-	ImageTitleSTART.CntMAX = IMAGE_TITLE_START_CNT_MAX;		//カウンタMAX
-	ImageTitleSTART.IsDraw = FALSE;							//描画させない
+	GetGraphSize(ImageTitleSTART.image.handle, &ImageTitleSTART.image.width, &ImageTitleSTART.image.height);	
+	ImageTitleSTART.image.x = GAME_WIDTH / 2 - ImageTitleSTART.image.width / 2;					
+	ImageTitleSTART.image.y = ImageTitleROGO.image.y + ImageTitleROGO.image.height / 2 + 10;	
+	ImageTitleSTART.Cnt = 0.0;								
+	ImageTitleSTART.CntMAX = IMAGE_TITLE_START_CNT_MAX;		
+	ImageTitleSTART.IsDraw = FALSE;							
 
 
-	strcpy_s(ImageBack.path, IMAGE_BACK_PATH);		//パスの設定
-	ImageBack.handle = LoadGraph(ImageBack.path);	//読み込み
+	strcpy_s(ImageBack.path, IMAGE_BACK_PATH);		
+	ImageBack.handle = LoadGraph(ImageBack.path);	
 	if (ImageBack.handle == -1)
 	{
-		//エラーメッセージ表示
+		
 		MessageBox(GetMainWindowHandle(), IMAGE_BACK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageBack.handle, &ImageBack.width, &ImageBack.height);	//画像の幅と高さを取得
-	ImageBack.x = GAME_WIDTH / 2 - ImageBack.width / 2;		//左右中央揃え
+	GetGraphSize(ImageBack.handle, &ImageBack.width, &ImageBack.height);	
+	ImageBack.x = GAME_WIDTH / 2 - ImageBack.width / 2;		
 	ImageBack.y = GAME_HEIGHT / 2 - ImageBack.height / 2;
 
-	//プレイヤーの画像
+	
 	strcpy_s(player.image.path, IMAGE_PLAYER_PATH);
 	player.image.handle = LoadGraph(player.image.path);
 	if (player.image.handle == -1)
@@ -1064,14 +1066,71 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_PLAYER_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(player.image.handle, &player.image.width, &player.image.height);	//画像の幅と高さを取得
-	player.image.x = GAME_WIDTH / 2 - player.image.width / 2;		//左右中央揃え
-	player.image.y = GAME_HEIGHT / 2 - player.image.height / 2;		//上下中央揃え
-	player.CenterX = player.image.x + player.image.width / 2;		//画像の横の中心を探す
-	player.CenterY = player.image.y + player.image.height / 2;		//画像の縦の中心を探す
-	player.speed = CHARA_SPEED_LOW;									//スピードを設定
+	GetGraphSize(player.image.handle, &player.image.width, &player.image.height);	
+	player.image.x = GAME_WIDTH / 2 - player.image.width / 2;		
+	player.image.y = GAME_HEIGHT / 2 - player.image.height / 2;		
+	player.CenterX = player.image.x + player.image.width / 2;		
+	player.CenterY = player.image.y + player.image.height / 2;		
+	player.speed = CHARA_SPEED_LOW;									
+
+	
+	int tamaRedRes = LoadDivGraph(
+		TAMA_RED_PATH,										
+		TAMA_DIV_NUM, TAMA_DIV_TATE, TAMA_DIV_YOKO,			
+		TAMA_DIV_WIDTH, TAMA_DIV_HEIGHT,					
+		&player.tama[0].handle[0]);							
+
+	
+
+	if (tamaRedRes == -1)
+	{
+		
+		MessageBox(GetMainWindowHandle(), TAMA_RED_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
 
 
+	GetGraphSize(player.tama[0].handle[0], &player.tama[0].width, &player.tama[0].height);
+
+	
+	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+	{
+		
+		strcpyDx(player.tama[cnt].path, TEXT(TAMA_RED_PATH));
+
+		for (int i_num = 0; i_num < TAMA_DIV_NUM; i_num++)
+		{
+			
+			player.tama[cnt].handle[i_num] = player.tama[0].handle[i_num];
+		}
+
+	
+		player.tama[cnt].width = player.tama[0].width;
+
+		
+		player.tama[cnt].height = player.tama[0].height;
+
+		
+		player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
+
+		
+		player.tama[cnt].y = player.image.y;
+
+		
+		player.tama[cnt].IsDraw = FALSE;
+
+		
+		player.tama[cnt].changeImageCnt = 0;
+
+		
+		player.tama[cnt].changeImageCntMAX = TAMA_CHANGE_MAX;
+
+		
+		player.tama[cnt].nowImageKind = 0;
+
+		
+		player.tama[cnt].speed = CHARA_SPEED_LOW;
+	}
 
 	return TRUE;
 }
@@ -1088,21 +1147,21 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(ImageTitleROGO.image.handle);
 	DeleteGraph(ImageTitleSTART.image.handle);
 
-
+	for (int i_num = 0; i_num < TAMA_DIV_NUM; i_num++) { DeleteGraph(player.tama[0].handle[i_num]); }
 
 
 	return;
 }
 
-//音楽をまとめて読み込む関数
+
 BOOL MY_LOAD_MUSIC(VOID)
 {
 
-	strcpy_s(BGM_TITLE.path, MUSIC_BGM_TITLE_PATH);				//パスの設定
-	BGM_TITLE.handle = LoadSoundMem(BGM_TITLE.path);			//読み込み
+	strcpy_s(BGM_TITLE.path, MUSIC_BGM_TITLE_PATH);				
+	BGM_TITLE.handle = LoadSoundMem(BGM_TITLE.path);			
 	if (BGM_TITLE.handle == -1)
 	{
-		//エラーメッセージ表示
+		
 		MessageBox(GetMainWindowHandle(), MUSIC_BGM_TITLE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
