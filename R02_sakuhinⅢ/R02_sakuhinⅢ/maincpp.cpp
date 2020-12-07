@@ -12,7 +12,7 @@
 #define GAME_FPS			60
 
 
-//#define MOUSE_BUTTON_CODE	129		
+#define MOUSE_BUTTON_CODE	129		
 
 
 #define PATH_MAX			255	
@@ -163,8 +163,8 @@ typedef struct STRUCT_MOUSE
 	int WheelValue = 0;
 	iPOINT Point;
 	iPOINT OldPoint;
-	//int OldButton[MOUSE_BUTTON_CODE] = { 0 };
-	//int Button[MOUSE_BUTTON_CODE] = { 0 };
+	int OldButton[MOUSE_BUTTON_CODE] = { 0 };
+	int Button[MOUSE_BUTTON_CODE] = { 0 };
 }MOUSE;
 
 
@@ -274,7 +274,7 @@ char AllKeyState[256] = { '\0' };
 char OldAllKeyState[256] = { '\0' };
 
 
-//MOUSE mouse;
+MOUSE mouse;
 
 FONT FontTanu32;
 
@@ -542,10 +542,10 @@ VOID MY_FPS_WAIT(VOID)
 	return;
 }
 
-//########## キーの入力状態を更新する関数 ##########
+
 VOID MY_ALL_KEYDOWN_UPDATE(VOID)
 {
-	//参考：https://dxlib.xsrv.jp/function/dxfunc_input.html
+	
 
 	char TempKey[256];	//一時的に、現在のキーの入力状態を格納する
 
@@ -761,7 +761,23 @@ VOID MY_START(VOID)
 
 //スタート画面の処理
 VOID MY_START_PROC(VOID)
-{
+{	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
+	{
+
+
+		if (CheckSoundMem(BGM_TITLE.handle) != 0)
+		{
+			StopSoundMem(BGM_TITLE.handle);
+		}
+
+		SetMouseDispFlag(TRUE);
+
+		GameScene = GAME_SCENE_PLAY;
+
+		return;
+	}
+
+
 
 	if (CheckSoundMem(BGM_TITLE.handle) == 0)
 	{
@@ -772,17 +788,7 @@ VOID MY_START_PROC(VOID)
 
 
 
-	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
-	{
 
-
-		if (CheckSoundMem(BGM_TITLE.handle) != 0)
-		{
-			StopSoundMem(BGM_TITLE.handle);
-		}
-
-		GameScene = GAME_SCENE_PLAY;
-	}
 
 
 
@@ -889,7 +895,7 @@ VOID MY_PLAY_PROC(VOID)
 	if (CheckSoundMem(BGM.handle) == 0)
 	{
 
-		ChangeVolumeSoundMem(255 * 50 / 100, BGM.handle);	//50%の音量にする
+		ChangeVolumeSoundMem(255 *100 / 100, BGM.handle);	//50%の音量にする
 
 
 		//DX_PLAYTYPE_NORMAL:　ノーマル再生
@@ -917,7 +923,7 @@ VOID MY_PLAY_PROC(VOID)
 	if (IsMove == TRUE)
 	{
 	
-	/*	if (mouse.Point.x >= 0 && mouse.Point.x <= GAME_WIDTH
+		if (mouse.Point.x >= 0 && mouse.Point.x <= GAME_WIDTH
 			&& mouse.Point.y >= 0 && mouse.Point.y <= GAME_HEIGHT)
 		{
 			
@@ -927,7 +933,7 @@ VOID MY_PLAY_PROC(VOID)
 		
 			player.collBeforePt.x = player.CenterX;
 			player.collBeforePt.y = player.CenterY;
-		}*/
+		}
 	}
 
 	if (MY_KEY_DOWN(KEY_INPUT_UP))
@@ -1470,11 +1476,11 @@ BOOL MY_LOAD_MUSIC(VOID)
 		return FALSE;
 	}
 
-	strcpy_s(BGM.path, MUSIC_BGM_PATH);
-	BGM.handle = LoadSoundMem(BGM.path);
+	strcpy_s(BGM.path, MUSIC_BGM_PATH);		
+	BGM.handle = LoadSoundMem(BGM.path);	
 	if (BGM.handle == -1)
 	{
-
+		
 		MessageBox(GetMainWindowHandle(), MUSIC_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
