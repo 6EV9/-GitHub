@@ -48,6 +48,22 @@
 #define MUSIC_PLAYER_SHOT_PATH TEXT(".\\MUSIC\\SHOT.mp3")
 #define MUSIC_BGM_TITLE_PATH		TEXT(".\\MUSIC\\BGMSTR.mp3")	
 
+#define GAME_MAP_TATE_MAX	9	
+#define GAME_MAP_YOKO_MAX	13	
+#define GAME_MAP_KIND_MAX	2	
+
+#define GAME_MAP_PATH			TEXT(".\\IMAGE\\MAP\\map.png")		
+
+#define MAP_DIV_WIDTH		64	
+#define MAP_DIV_HEIGHT		64	
+#define MAP_DIV_TATE		10	
+#define MAP_DIV_YOKO		4	
+#define MAP_DIV_NUM	MAP_DIV_TATE * MAP_DIV_YOKO	
+
+
+#define START_ERR_TITLE		TEXT("スタート位置エラー")
+#define START_ERR_CAPTION	TEXT("スタート位置が決まっていません")
+
 
 #define MOUSE_R_CLICK_TITLE		TEXT("ゲーム中断")
 #define MOUSE_R_CLICK_CAPTION	TEXT("ゲームを中断し、タイトル画面に戻りますか？")
@@ -84,12 +100,18 @@
 #define START_ERR_TITLE		TEXT("スタート位置エラー")
 #define START_ERR_CAPTION	TEXT("スタート位置が決まっていません")
 
+#define KEY_RETURN_CLICK_TITLE		TEXT("ゲーム中断")
+#define KEY_RETURN_CLICK_CAPTION	TEXT("ゲームを中断し、タイトル画面に戻りますか？")
+
 enum GAME_MAP_KIND
 {
 	n = -1,	//(NONE)未定
-	k = 0,	//壁
-	t = 9,	//通路
-	s = 5,	//スタート
+	k = 10,	//壁
+	k2 = 11,
+	k3 = 13,
+
+	t = 33,	//通路
+	s = 32,	//スタート
 	g = 3	//ゴール
 };
 
@@ -192,6 +214,8 @@ typedef struct STRUCT_CHARA
 	iPOINT collBeforePt;
 
 	TAMA tama[TAMA_MAX];
+
+	
 }CHARA;
 
 
@@ -220,20 +244,20 @@ typedef struct STRUCT_IMAGE_BLINK
 
 typedef struct STRUCT_MAP_IMAGE
 {
-	char path[PATH_MAX];
-	int handle[MAP_DIV_NUM];
-	int kind[MAP_DIV_NUM];
-	int width;
-	int height;
+	char path[PATH_MAX];				
+	int handle[MAP_DIV_NUM];			
+	int kind[MAP_DIV_NUM];				
+	int width;							
+	int height;							
 }MAPCHIP;	//MAP_IMAGE構造体
 
 typedef struct STRUCT_MAP
 {
-	GAME_MAP_KIND kind;
-	int x;
-	int y;
-	int width;
-	int height;
+	GAME_MAP_KIND kind;			
+	int x;						
+	int y;						
+	int width;					
+	int height;					
 }MAP;
 
 
@@ -277,16 +301,16 @@ MUSIC BGM_TITLE;
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
-		k,k,k,k,k,k,k,k,k,k,k,g,k,	// 0
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 0
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 2
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
-		k,t,k,k,k,k,k,k,k,k,k,k,k,	// 4
+		k,k,k,k,t,k,k,k,k,k,k,k,k,// 4
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 5
-		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
+		k,t,t,t,t,t,s,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
-		k,k,k,k,k,k,k,k,k,k,k,s,k,	// 8
-};
+		k,k,k,k,k,k,k,k,k,k,k,k,k,	// 8
+};	
 
 
 GAME_MAP_KIND mapDataInit[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
@@ -294,13 +318,14 @@ GAME_MAP_KIND mapDataInit[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
 
 MAPCHIP mapChip;
 
+MOUSE mouse;
 
 MAP map[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
 
 
 iPOINT startPt{ -1,-1 };
 
-
+RECT mapColl[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
 
 VOID MY_FPS_UPDATE(VOID);
 VOID MY_FPS_DRAW(VOID);
@@ -342,6 +367,8 @@ VOID MY_DELETE_MUSIC(VOID);
 BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);
 BOOL MY_CHECK_RECT_COLL(RECT, RECT);
 
+BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);	
+BOOL MY_CHECK_RECT_COLL(RECT, RECT);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -387,7 +414,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	PlayerX = 0;
 	PlayerY = 0;
 
-	SetDrawScreen(DX_SCREEN_BACK);	//Draw系関数は裏画面に描画
+	SetDrawScreen(DX_SCREEN_BACK);	
+
+	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+		{
+			
+			if (mapData[tate][yoko] == s)
+			{
+				
+				startPt.x = mapChip.width * yoko + mapChip.width / 2;	
+				startPt.y = mapChip.height * tate + mapChip.height / 2;
+				break;
+			}
+		}
+		
+		if (startPt.x != -1 && startPt.y != -1) { break; }
+	}
+
+
+	if (startPt.x == -1 && startPt.y == -1)
+	{
+		
+		MessageBox(GetMainWindowHandle(), START_ERR_CAPTION, START_ERR_TITLE, MB_OK);	return -1;
+	}
 
 	while (TRUE)
 	{
@@ -568,6 +619,80 @@ BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
 	}
 }
 
+VOID MY_MOUSE_UPDATE(VOID)
+{
+	
+	mouse.OldPoint = mouse.Point;
+
+	
+	for (int i = 0; i < MOUSE_BUTTON_CODE; i++) { mouse.OldButton[i] = mouse.Button[i]; }
+
+	
+	GetMousePoint(&mouse.Point.x, &mouse.Point.y);
+
+
+	mouse.InputValue = GetMouseInput();
+
+	
+	if ((mouse.InputValue & MOUSE_INPUT_LEFT) == MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT]++; }		
+	if ((mouse.InputValue & MOUSE_INPUT_LEFT) != MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT] = 0; }		
+
+	
+	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) == MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE]++; }	
+	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) != MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE] = 0; }	
+
+	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) == MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT]++; }		
+	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) != MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT] = 0; }	
+	
+	mouse.WheelValue = GetMouseWheelRotVol();
+
+	return;
+}
+
+
+BOOL MY_MOUSE_DOWN(int MOUSE_INPUT_)
+{
+	
+	if (mouse.Button[MOUSE_INPUT_] != 0)
+	{
+		return TRUE;	
+	}
+	else
+	{
+		return FALSE;	
+	}
+}
+
+
+BOOL MY_MOUSE_UP(int MOUSE_INPUT_)
+{
+	if (mouse.OldButton[MOUSE_INPUT_] >= 1	
+		&& mouse.Button[MOUSE_INPUT_] == 0)
+	{
+		return TRUE;	
+	}
+	else
+	{
+		return FALSE;	
+	}
+}
+
+
+
+BOOL MY_MOUSEDOWN_KEEP(int MOUSE_INPUT_, int DownTime)
+{
+
+	int UpdateTime = DownTime * GAME_FPS;
+
+	if (mouse.Button[MOUSE_INPUT_] > UpdateTime)
+	{
+		return TRUE;	
+	}
+	else
+	{
+		return FALSE;	
+	}
+}
 
 
 
@@ -644,6 +769,8 @@ VOID MY_START_PROC(VOID)
 		ChangeVolumeSoundMem(255 * 50 / 100, BGM_TITLE.handle);
 		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
 	}
+
+
 
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
@@ -735,7 +862,7 @@ VOID MY_PLAY(VOID)
 //プレイ画面の処理
 VOID MY_PLAY_PROC(VOID)
 {
-	//スペースキーを押したら、エンドシーンへ移動する
+	//ESCキーを押したら、エンドシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
 	{
 
@@ -746,6 +873,14 @@ VOID MY_PLAY_PROC(VOID)
 		}
 
 		SetMouseDispFlag(TRUE);
+
+		player.CenterX = startPt.x;
+		player.CenterY = startPt.y;
+
+		player.image.x = player.CenterX;
+		player.image.y = player.CenterY;
+
+		SetMousePoint(player.image.x, player.image.y);
 
 		GameScene = GAME_SCENE_END;
 		return;
@@ -763,7 +898,75 @@ VOID MY_PLAY_PROC(VOID)
 		
 		(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
+	if (mouse.Button[MOUSE_INPUT_RIGHT] == TRUE)
+	{
+	
+		iPOINT R_ClickPt = mouse.Point;
 
+		//マウスを表示
+		SetMouseDispFlag(TRUE);
+
+		//終了ダイアログを表示
+		int Ret = MessageBox(GetMainWindowHandle(), MOUSE_R_CLICK_CAPTION, MOUSE_R_CLICK_TITLE, MB_YESNO);
+
+		if (Ret == IDYES)		
+		{
+			
+			GameScene = GAME_SCENE_START;
+			return;
+
+		}
+		else if (Ret == IDNO)	
+		{
+			
+			SetMousePoint(R_ClickPt.x, R_ClickPt.y);
+
+			
+			SetMouseDispFlag(FALSE);
+		}
+	}
+
+	
+
+	
+	if (mouse.Point.x >= 0 && mouse.Point.x <= GAME_WIDTH
+		&& mouse.Point.y >= 0 && mouse.Point.y <= GAME_HEIGHT)
+	{
+		
+		player.CenterX = mouse.Point.x;
+		player.CenterY = mouse.Point.y;
+	}
+
+
+	player.coll.left = player.CenterX - mapChip.width / 2 + 5;
+	player.coll.top = player.CenterY - mapChip.height / 2 + 5;
+	player.coll.right = player.CenterX + mapChip.width / 2 - 5;
+	player.coll.bottom = player.CenterY + mapChip.height / 2 - 5;
+
+	BOOL IsMove = TRUE;
+
+	
+	if (MY_CHECK_MAP1_PLAYER_COLL(player.coll) == TRUE)
+	{
+		SetMousePoint(player.collBeforePt.x, player.collBeforePt.y);
+		IsMove = FALSE;
+	}
+
+	if (IsMove == TRUE)
+	{
+	
+		if (mouse.Point.x >= 0 && mouse.Point.x <= GAME_WIDTH
+			&& mouse.Point.y >= 0 && mouse.Point.y <= GAME_HEIGHT)
+		{
+			
+			player.image.x = player.CenterX - player.image.width / 2;
+			player.image.y = player.CenterY - player.image.height / 2;
+
+		
+			player.collBeforePt.x = player.CenterX;
+			player.collBeforePt.y = player.CenterY;
+		}
+	}
 
 	if (MY_KEY_DOWN(KEY_INPUT_UP))
 	{
@@ -821,6 +1024,8 @@ VOID MY_PLAY_PROC(VOID)
 	player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
 
 
+
+
 	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 	{
 
@@ -862,8 +1067,7 @@ VOID MY_PLAY_PROC(VOID)
 	//}
 
 	
-	//player.CenterX = mouse.Point.x;
-	//player.CenterY = mouse.Point.y;
+	
 
 
 	
@@ -909,6 +1113,41 @@ VOID MY_PLAY_DRAW(VOID)
 
 	DrawGraph(ImageBack.x, ImageBack.y, ImageBack.handle, TRUE);
 	
+	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+		{
+			//マップを描画
+			DrawGraph(
+				map[tate][yoko].x,
+				map[tate][yoko].y,
+				mapChip.handle[map[tate][yoko].kind],
+				TRUE);
+		}
+	}
+
+	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+		{
+			//壁ならば
+			if (mapData[tate][yoko] == k)
+			{
+				DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, GetColor(0, 0, 255), FALSE);
+			}
+
+			//通路ならば
+			if (mapData[tate][yoko] == t)
+			{
+				DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, GetColor(255, 255, 0), FALSE);
+			}
+		}
+	}
+	DrawGraph(player.image.x, player.image.y, player.image.handle, TRUE);
+
+	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
+
+
 	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
 	{
 		
@@ -918,7 +1157,7 @@ VOID MY_PLAY_DRAW(VOID)
 			DrawGraph(
 				player.tama[cnt].x,
 				player.tama[cnt].y,
-				player.tama[cnt].handle[player.tama[cnt].nowImageKind],	//現在の画像の種類にあったハンドル
+				player.tama[cnt].handle[player.tama[cnt].nowImageKind],	
 				TRUE);
 
 			
@@ -953,7 +1192,53 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 	}
 
+	int mapRes = LoadDivGraph(
+		GAME_MAP_PATH,										
+		MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,			
+		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,						
+		&mapChip.handle[0]);								
 
+	//if (mapRes == -1)
+	//{
+	//	//エラーメッセージ表示
+	//	MessageBox(GetMainWindowHandle(), GAME_MAP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+	//	return FALSE;
+	//}
+
+	
+	GetGraphSize(mapChip.handle[0], &mapChip.width, &mapChip.height);
+
+	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+		{
+		
+			mapDataInit[tate][yoko] = mapData[tate][yoko];
+
+			
+			map[tate][yoko].kind = mapData[tate][yoko];
+
+		
+			map[tate][yoko].width = mapChip.width;
+			map[tate][yoko].height = mapChip.height;
+
+		
+			map[tate][yoko].x = yoko * map[tate][yoko].width;
+			map[tate][yoko].y = tate * map[tate][yoko].height;
+		}
+	}
+
+	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+		{
+		
+			mapColl[tate][yoko].left = (yoko + 0) * mapChip.width + 1;
+			mapColl[tate][yoko].top = (tate + 0) * mapChip.height + 1;
+			mapColl[tate][yoko].right = (yoko + 1) * mapChip.width - 1;
+			mapColl[tate][yoko].bottom = (tate + 1) * mapChip.height - 1;
+		}
+	}
 	//プレイヤーを描画する(画像を引き伸ばして描画※処理負荷が高い！多用に注意！)
 	//DrawExtendGraph(
 	//	player.image.x, player.image.y,														//ココから
@@ -1171,6 +1456,7 @@ VOID MY_DELETE_IMAGE(VOID)
 
 	for (int i_num = 0; i_num < TAMA_DIV_NUM; i_num++) { DeleteGraph(player.tama[0].handle[i_num]); }
 
+	for (int i_num = 0; i_num < MAP_DIV_NUM; i_num++) { DeleteGraph(mapChip.handle[i_num]); }
 
 	return;
 }
@@ -1219,3 +1505,36 @@ VOID MY_DELETE_MUSIC(VOID)
 	return;
 }
 
+BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
+{
+	
+	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+		{
+			
+			if (MY_CHECK_RECT_COLL(player, mapColl[tate][yoko]) == TRUE)
+			{
+				
+				if (map[tate][yoko].kind == k) { return TRUE; }
+			}
+		}
+	}
+
+	return FALSE;
+}
+
+
+BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
+{
+	if (a.left < b.right &&
+		a.top < b.bottom &&
+		a.right > b.left &&
+		a.bottom > b.top
+		)
+	{
+		return TRUE;	
+	}
+
+	return FALSE;		
+}
