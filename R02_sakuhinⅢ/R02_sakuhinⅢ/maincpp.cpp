@@ -45,6 +45,7 @@
 #define MUSIC_LOAD_ERR_TITLE TEXT("音楽読み込みエラー")
 
 #define MUSIC_BGM_PATH            TEXT(".\\MUSIC\\BGMpaly.mp3")
+#define MUSIC_PLAYER_SHOT_PATH TEXT(".\\MUSIC\\SHOT.mp3")
 #define MUSIC_BGM_TITLE_PATH		TEXT(".\\MUSIC\\BGMSTR.mp3")	
 
 
@@ -54,15 +55,18 @@
 #define TAMA_CHANGE_MAX 5
 #define TAMA_MAX       16
 
-#define TAMA_RED_PATH  TEXT(".\\IMAGE\\tama.png")
+#define TAMA_CHANGE_MAX		 5	//5フレーム目で弾の画像を変える
+#define TAMA_MAX			16	//最大16発まで
 
-#define TAMA_DIV_WIDTH 16
-#define TAMA_DIV_HEIGHT 16
+#define TAMA_RED_PATH			TEXT(".\\IMAGE\\tama.png")		//赤弾の画像
 
-#define TAMA_DIV_TATE   3
-#define TAMA_DIV_YOKO   1
+#define TAMA_DIV_WIDTH		16	//画像を分割する幅サイズ
+#define TAMA_DIV_HEIGHT		16	//画像を分割する高さサイズ
 
-#define TAMA_DIV_NUM  TAMA_DIV_TATE * TAMA_DIV_YOKO
+#define TAMA_DIV_TATE		3	//画像を縦に分割する数
+#define TAMA_DIV_YOKO		1	//画像を横に分割する数
+
+#define TAMA_DIV_NUM	TAMA_DIV_TATE * TAMA_DIV_YOKO
 
 #define GAME_MAP_TATE_MAX	9	
 #define GAME_MAP_YOKO_MAX	13	
@@ -110,17 +114,17 @@ enum CHARA_RELOAD {
 
 typedef struct STRUCT_TAMA
 {
-	char path[PATH_MAX];				
-	int handle[TAMA_DIV_NUM];			
-	int x;								
-	int y;								
-	int width;							
-	int height;							
-	BOOL IsDraw;						
-	int nowImageKind;					
-	int changeImageCnt;					
-	int changeImageCntMAX;				
-	int speed;							
+	char path[PATH_MAX];				//パス
+	int handle[TAMA_DIV_NUM];			//分割したの弾の画像ハンドルを取得
+	int x;								//X位置
+	int y;								//Y位置
+	int width;							//幅
+	int height;							//高さ
+	BOOL IsDraw;						//弾を表示できるか
+	int nowImageKind;					//弾の現在の画像
+	int changeImageCnt;					//画像を変えるためのカウント
+	int changeImageCntMAX;				//画像を変えるためのカウント(MAX)
+	int speed;							//スピード
 }TAMA;
 
 
@@ -872,7 +876,24 @@ VOID MY_PLAY_PROC(VOID)
 	if (player.image.y < 0) { player.image.y = 0; }
 	if (player.image.y + player.image.height > GAME_HEIGHT) { player.image.y = GAME_HEIGHT - player.image.height; }
 
+	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+	{
+		if (player.CanShot == TRUE)
+		{
+			PlaySoundMem(player.musicShot.handle, DX_PLAYTYPE_BACK);
+			player.CanShot = FALSE;
+		}
+	}
 
+	if (player.CanShot == FALSE)
+	{
+		if (player.ShotReLoadCnt == player.ShotReLoadCntMAX)
+		{
+			player.ShotReLoadCnt = 0;
+			player.CanShot = TRUE;
+		}
+		player.ShotReLoadCnt++;
+	}
 
 
 
@@ -960,7 +981,7 @@ VOID MY_PLAY_DRAW(VOID)
 	return;
 }
 
-
+//エンド画面
 VOID MY_END(VOID)
 {
 	MY_END_PROC();	
@@ -968,7 +989,7 @@ VOID MY_END(VOID)
 	return;
 }
 
-
+//エンド画面の処理
 VOID MY_END_PROC(VOID)
 {
 	
@@ -982,13 +1003,14 @@ VOID MY_END_PROC(VOID)
 	return;
 }
 
-
+//エンド画面処理
 VOID MY_END_DRAW(VOID)
 {
 
 	DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(0, 0, 255), TRUE);
 
 	DrawString(0, 0, "エンド画面(スペースキーを押して下さい)", GetColor(255, 255, 255));
+	
 	return;
 }
 
@@ -1175,15 +1197,15 @@ BOOL MY_LOAD_MUSIC(VOID)
 		return FALSE;
 	}
 
-	////プレイヤーのショット音
-	//strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);			
-	//player.musicShot.handle = LoadSoundMem(player.musicShot.path);		
-	//if (player.musicShot.handle == -1)
-	//{
-	//	
-	//	MessageBox(GetMainWindowHandle(), MUSIC_PLAYER_SHOT_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-	//	return FALSE;
-	//}
+	//プレイヤーのショット音
+	strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);			
+	player.musicShot.handle = LoadSoundMem(player.musicShot.path);		
+	if (player.musicShot.handle == -1)
+	{
+		
+		MessageBox(GetMainWindowHandle(), MUSIC_PLAYER_SHOT_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
 
 	return TRUE;
 }
