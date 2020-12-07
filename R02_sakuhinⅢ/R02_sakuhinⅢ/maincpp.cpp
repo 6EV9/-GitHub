@@ -215,7 +215,7 @@ typedef struct STRUCT_CHARA
 
 	TAMA tama[TAMA_MAX];
 
-	
+
 }CHARA;
 
 
@@ -244,20 +244,20 @@ typedef struct STRUCT_IMAGE_BLINK
 
 typedef struct STRUCT_MAP_IMAGE
 {
-	char path[PATH_MAX];				
-	int handle[MAP_DIV_NUM];			
-	int kind[MAP_DIV_NUM];				
-	int width;							
-	int height;							
+	char path[PATH_MAX];
+	int handle[MAP_DIV_NUM];
+	int kind[MAP_DIV_NUM];
+	int width;
+	int height;
 }MAPCHIP;	//MAP_IMAGE構造体
 
 typedef struct STRUCT_MAP
 {
-	GAME_MAP_KIND kind;			
-	int x;						
-	int y;						
-	int width;					
-	int height;					
+	GAME_MAP_KIND kind;
+	int x;
+	int y;
+	int width;
+	int height;
 }MAP;
 
 
@@ -310,7 +310,7 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 		k,t,t,t,t,t,s,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
 		k,k,k,k,k,k,k,k,k,k,k,k,k,	// 8
-};	
+};
 
 
 GAME_MAP_KIND mapDataInit[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
@@ -367,7 +367,7 @@ VOID MY_DELETE_MUSIC(VOID);
 BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);
 BOOL MY_CHECK_RECT_COLL(RECT, RECT);
 
-BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);	
+BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);
 BOOL MY_CHECK_RECT_COLL(RECT, RECT);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -414,29 +414,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	PlayerX = 0;
 	PlayerY = 0;
 
-	SetDrawScreen(DX_SCREEN_BACK);	
+	SetDrawScreen(DX_SCREEN_BACK);
 
 	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
-			
+
 			if (mapData[tate][yoko] == s)
 			{
-				
-				startPt.x = mapChip.width * yoko + mapChip.width / 2;	
+
+				startPt.x = mapChip.width * yoko + mapChip.width / 2;
 				startPt.y = mapChip.height * tate + mapChip.height / 2;
 				break;
 			}
 		}
-		
+
 		if (startPt.x != -1 && startPt.y != -1) { break; }
 	}
 
 
 	if (startPt.x == -1 && startPt.y == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), START_ERR_CAPTION, START_ERR_TITLE, MB_OK);	return -1;
 	}
 
@@ -803,14 +803,14 @@ VOID MY_START_PROC(VOID)
 	{
 		//タイトルロゴが移動しきったら
 
-		
+
 		if (ImageTitleSTART.Cnt < ImageTitleSTART.CntMAX)
 		{
 			ImageTitleSTART.Cnt += IMAGE_TITLE_START_CNT;
 		}
 		else
 		{
-		
+
 			if (ImageTitleSTART.IsDraw == FALSE)
 			{
 				ImageTitleSTART.IsDraw = TRUE;
@@ -834,10 +834,10 @@ VOID MY_START_DRAW(VOID)
 
 
 	DrawRotaGraph(
-		ImageTitleROGO.image.x, ImageTitleROGO.image.y,	
-		ImageTitleROGO.rate,							
-		ImageTitleROGO.angle,							
-		ImageTitleROGO.image.handle, TRUE);				
+		ImageTitleROGO.image.x, ImageTitleROGO.image.y,
+		ImageTitleROGO.rate,
+		ImageTitleROGO.angle,
+		ImageTitleROGO.image.handle, TRUE);
 
 	//点滅
 	if (ImageTitleSTART.IsDraw == TRUE)
@@ -895,10 +895,10 @@ VOID MY_PLAY_PROC(VOID)
 		//DX_PLAYTYPE_NORMAL:　ノーマル再生
 		//DX_PLAYTYPE_BACK  : バックグラウンド再生
 		//DX_PLAYTYPE_LOOP  : ループ再生
-		
+
 		(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
-	
+
 
 	player.coll.left = player.CenterX - mapChip.width / 2 + 5;
 	player.coll.top = player.CenterY - mapChip.height / 2 + 5;
@@ -907,7 +907,7 @@ VOID MY_PLAY_PROC(VOID)
 
 	BOOL IsMove = TRUE;
 
-	
+
 	if (MY_CHECK_MAP1_PLAYER_COLL(player.coll) == TRUE)
 	{
 		SetMousePoint(player.collBeforePt.x, player.collBeforePt.y);
@@ -916,15 +916,15 @@ VOID MY_PLAY_PROC(VOID)
 
 	if (IsMove == TRUE)
 	{
-	
+
 		if (mouse.Point.x >= 0 && mouse.Point.x <= GAME_WIDTH
 			&& mouse.Point.y >= 0 && mouse.Point.y <= GAME_HEIGHT)
 		{
-			
+
 			player.image.x = player.CenterX - player.image.width / 2;
 			player.image.y = player.CenterY - player.image.height / 2;
 
-		
+
 			player.collBeforePt.x = player.CenterX;
 			player.collBeforePt.y = player.CenterY;
 		}
@@ -954,7 +954,7 @@ VOID MY_PLAY_PROC(VOID)
 		}
 	}
 
-	
+
 
 
 	if (MY_KEY_DOWN(KEY_INPUT_LEFT))
@@ -962,7 +962,7 @@ VOID MY_PLAY_PROC(VOID)
 		player.CenterX -= CHARA_SPEED_MIDI;
 	}
 	else if (KEY_INPUT_LEFT)
-		if(player.CenterX < GAME_WIDTH/2)
+		if (player.CenterX < GAME_WIDTH / 2)
 		{
 			player.CenterX += CHARA_SPEED_MIDI;
 		}
@@ -1028,15 +1028,15 @@ VOID MY_PLAY_PROC(VOID)
 	//	}
 	//}
 
-	
-	
 
 
-	
+
+
+
 	player.image.x = player.CenterX - player.image.width / 2;
 	player.image.y = player.CenterY - player.image.height / 2;
 
-	
+
 	if (player.image.x < 0) { player.image.x = 0; }
 	if (player.image.x + player.image.width > GAME_WIDTH) { player.image.x = GAME_WIDTH - player.image.width; }
 	if (player.image.y < 0) { player.image.y = 0; }
@@ -1074,7 +1074,7 @@ VOID MY_PLAY_DRAW(VOID)
 {
 
 	DrawGraph(ImageBack.x, ImageBack.y, ImageBack.handle, TRUE);
-	
+
 	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
@@ -1112,40 +1112,40 @@ VOID MY_PLAY_DRAW(VOID)
 
 	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
 	{
-		
+
 		if (player.tama[cnt].IsDraw == TRUE)
 		{
-			
+
 			DrawGraph(
 				player.tama[cnt].x,
 				player.tama[cnt].y,
-				player.tama[cnt].handle[player.tama[cnt].nowImageKind],	
+				player.tama[cnt].handle[player.tama[cnt].nowImageKind],
 				TRUE);
 
-			
+
 			if (player.tama[cnt].changeImageCnt < player.tama[cnt].changeImageCntMAX)
 			{
 				player.tama[cnt].changeImageCnt++;
 			}
 			else
 			{
-				
-				if (player.tama[cnt].nowImageKind < TAMA_DIV_NUM - 1)	
+
+				if (player.tama[cnt].nowImageKind < TAMA_DIV_NUM - 1)
 				{
-					player.tama[cnt].nowImageKind++;	
+					player.tama[cnt].nowImageKind++;
 				}
 				else
 				{
-					player.tama[cnt].nowImageKind = 0;	
+					player.tama[cnt].nowImageKind = 0;
 				}
 
 				player.tama[cnt].changeImageCnt = 0;
 			}
 
-			
+
 			if (player.tama[cnt].y < 0)
 			{
-				player.tama[cnt].IsDraw = FALSE;	
+				player.tama[cnt].IsDraw = FALSE;
 			}
 			else
 			{
@@ -1155,10 +1155,10 @@ VOID MY_PLAY_DRAW(VOID)
 	}
 
 	int mapRes = LoadDivGraph(
-		GAME_MAP_PATH,										
-		MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,			
-		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,						
-		&mapChip.handle[0]);								
+		GAME_MAP_PATH,
+		MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,
+		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,
+		&mapChip.handle[0]);
 
 	//if (mapRes == -1)
 	//{
@@ -1167,24 +1167,24 @@ VOID MY_PLAY_DRAW(VOID)
 	//	return FALSE;
 	//}
 
-	
+
 	GetGraphSize(mapChip.handle[0], &mapChip.width, &mapChip.height);
 
 	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
-		
+
 			mapDataInit[tate][yoko] = mapData[tate][yoko];
 
-			
+
 			map[tate][yoko].kind = mapData[tate][yoko];
 
-		
+
 			map[tate][yoko].width = mapChip.width;
 			map[tate][yoko].height = mapChip.height;
 
-		
+
 			map[tate][yoko].x = yoko * map[tate][yoko].width;
 			map[tate][yoko].y = tate * map[tate][yoko].height;
 		}
@@ -1194,7 +1194,7 @@ VOID MY_PLAY_DRAW(VOID)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
-		
+
 			mapColl[tate][yoko].left = (yoko + 0) * mapChip.width + 1;
 			mapColl[tate][yoko].top = (tate + 0) * mapChip.height + 1;
 			mapColl[tate][yoko].right = (yoko + 1) * mapChip.width - 1;
@@ -1218,7 +1218,7 @@ VOID MY_PLAY_DRAW(VOID)
 	*/
 
 
-	
+
 	DrawGraph(player.image.x, player.image.y, player.image.handle, TRUE);
 
 
@@ -1231,15 +1231,15 @@ VOID MY_PLAY_DRAW(VOID)
 //エンド画面
 VOID MY_END(VOID)
 {
-	MY_END_PROC();	
-	MY_END_DRAW();	
+	MY_END_PROC();
+	MY_END_DRAW();
 	return;
 }
 
 //エンド画面の処理
 VOID MY_END_PROC(VOID)
 {
-	
+
 	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 	{
 		SetMouseDispFlag(TRUE);
@@ -1257,7 +1257,7 @@ VOID MY_END_DRAW(VOID)
 	DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(0, 0, 255), TRUE);
 
 	DrawString(0, 0, "エンド画面(スペースキーを押して下さい)", GetColor(255, 255, 255));
-	
+
 	return;
 }
 
@@ -1272,61 +1272,61 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleBK.handle = LoadGraph(ImageTitleBK.path);
 	if (ImageTitleBK.handle == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_BK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageTitleBK.handle, &ImageTitleBK.width, &ImageTitleBK.height);	
-	ImageTitleBK.x = GAME_WIDTH / 2 - ImageTitleBK.width / 2;		
-	ImageTitleBK.y = GAME_HEIGHT / 2 - ImageTitleBK.height / 2;		
+	GetGraphSize(ImageTitleBK.handle, &ImageTitleBK.width, &ImageTitleBK.height);
+	ImageTitleBK.x = GAME_WIDTH / 2 - ImageTitleBK.width / 2;
+	ImageTitleBK.y = GAME_HEIGHT / 2 - ImageTitleBK.height / 2;
 
-	
+
 	strcpy_s(ImageTitleROGO.image.path, IMAGE_TITLE_ROGO_PATH);
 	ImageTitleROGO.image.handle = LoadGraph(ImageTitleROGO.image.path);
 	if (ImageTitleROGO.image.handle == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_ROGO_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageTitleROGO.image.handle, &ImageTitleROGO.image.width, &ImageTitleROGO.image.height);	
-	ImageTitleROGO.image.x = 230;							
-	ImageTitleROGO.image.y = GAME_HEIGHT / 2;				
-	ImageTitleROGO.angle = DX_PI * 2;						
-	ImageTitleROGO.angleMAX = DX_PI * 2;					
-	ImageTitleROGO.rate = 0.0;								
-	ImageTitleROGO.rateMAX = IMAGE_TITLE_ROGO_ROTA_MAX;		
+	GetGraphSize(ImageTitleROGO.image.handle, &ImageTitleROGO.image.width, &ImageTitleROGO.image.height);
+	ImageTitleROGO.image.x = 230;
+	ImageTitleROGO.image.y = GAME_HEIGHT / 2;
+	ImageTitleROGO.angle = DX_PI * 2;
+	ImageTitleROGO.angleMAX = DX_PI * 2;
+	ImageTitleROGO.rate = 0.0;
+	ImageTitleROGO.rateMAX = IMAGE_TITLE_ROGO_ROTA_MAX;
 
-	
+
 	strcpy_s(ImageTitleSTART.image.path, IMAGE_TITLE_START_PATH);
 	ImageTitleSTART.image.handle = LoadGraph(ImageTitleSTART.image.path);
 	if (ImageTitleSTART.image.handle == -1)
 	{
-	
+
 		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_START_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageTitleSTART.image.handle, &ImageTitleSTART.image.width, &ImageTitleSTART.image.height);	
-	ImageTitleSTART.image.x = GAME_WIDTH / 2 - ImageTitleSTART.image.width / 2;					
-	ImageTitleSTART.image.y = ImageTitleROGO.image.y + ImageTitleROGO.image.height / 2 + 10;	
-	ImageTitleSTART.Cnt = 0.0;								
-	ImageTitleSTART.CntMAX = IMAGE_TITLE_START_CNT_MAX;		
-	ImageTitleSTART.IsDraw = FALSE;							
+	GetGraphSize(ImageTitleSTART.image.handle, &ImageTitleSTART.image.width, &ImageTitleSTART.image.height);
+	ImageTitleSTART.image.x = GAME_WIDTH / 2 - ImageTitleSTART.image.width / 2;
+	ImageTitleSTART.image.y = ImageTitleROGO.image.y + ImageTitleROGO.image.height / 2 + 10;
+	ImageTitleSTART.Cnt = 0.0;
+	ImageTitleSTART.CntMAX = IMAGE_TITLE_START_CNT_MAX;
+	ImageTitleSTART.IsDraw = FALSE;
 
 
-	strcpy_s(ImageBack.path, IMAGE_BACK_PATH);		
-	ImageBack.handle = LoadGraph(ImageBack.path);	
+	strcpy_s(ImageBack.path, IMAGE_BACK_PATH);
+	ImageBack.handle = LoadGraph(ImageBack.path);
 	if (ImageBack.handle == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), IMAGE_BACK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageBack.handle, &ImageBack.width, &ImageBack.height);	
-	ImageBack.x = GAME_WIDTH / 2 - ImageBack.width / 2;		
+	GetGraphSize(ImageBack.handle, &ImageBack.width, &ImageBack.height);
+	ImageBack.x = GAME_WIDTH / 2 - ImageBack.width / 2;
 	ImageBack.y = GAME_HEIGHT / 2 - ImageBack.height / 2;
 
-	
+
 	strcpy_s(player.image.path, IMAGE_PLAYER_PATH);
 	player.image.handle = LoadGraph(player.image.path);
 	if (player.image.handle == -1)
@@ -1335,25 +1335,25 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_PLAYER_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(player.image.handle, &player.image.width, &player.image.height);	
-	player.image.x = GAME_WIDTH / 2 - player.image.width / 2;		
-	player.image.y = GAME_HEIGHT / 2 - player.image.height / 2;		
-	player.CenterX = player.image.x + player.image.width / 2;		
-	player.CenterY = player.image.y + player.image.height / 2;		
-	player.speed = CHARA_SPEED_LOW;									
+	GetGraphSize(player.image.handle, &player.image.width, &player.image.height);
+	player.image.x = GAME_WIDTH / 2 - player.image.width / 2;
+	player.image.y = GAME_HEIGHT / 2 - player.image.height / 2;
+	player.CenterX = player.image.x + player.image.width / 2;
+	player.CenterY = player.image.y + player.image.height / 2;
+	player.speed = CHARA_SPEED_LOW;
 
-	
+
 	int tamaRedRes = LoadDivGraph(
-		TAMA_RED_PATH,										
-		TAMA_DIV_NUM, TAMA_DIV_TATE, TAMA_DIV_YOKO,			
-		TAMA_DIV_WIDTH, TAMA_DIV_HEIGHT,					
-		&player.tama[0].handle[0]);							
+		TAMA_RED_PATH,
+		TAMA_DIV_NUM, TAMA_DIV_TATE, TAMA_DIV_YOKO,
+		TAMA_DIV_WIDTH, TAMA_DIV_HEIGHT,
+		&player.tama[0].handle[0]);
 
-	
+
 
 	if (tamaRedRes == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), TAMA_RED_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
@@ -1361,43 +1361,43 @@ BOOL MY_LOAD_IMAGE(VOID)
 
 	GetGraphSize(player.tama[0].handle[0], &player.tama[0].width, &player.tama[0].height);
 
-	
+
 	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
 	{
-		
+
 		strcpyDx(player.tama[cnt].path, TEXT(TAMA_RED_PATH));
 
 		for (int i_num = 0; i_num < TAMA_DIV_NUM; i_num++)
 		{
-			
+
 			player.tama[cnt].handle[i_num] = player.tama[0].handle[i_num];
 		}
 
-	
+
 		player.tama[cnt].width = player.tama[0].width;
 
-		
+
 		player.tama[cnt].height = player.tama[0].height;
 
-		
+
 		player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
 
-		
+
 		player.tama[cnt].y = player.image.y;
 
-		
+
 		player.tama[cnt].IsDraw = FALSE;
 
-		
+
 		player.tama[cnt].changeImageCnt = 0;
 
-		
+
 		player.tama[cnt].changeImageCntMAX = TAMA_CHANGE_MAX;
 
-		
+
 		player.tama[cnt].nowImageKind = 0;
 
-		
+
 		player.tama[cnt].speed = CHARA_SPEED_LOW;
 	}
 
@@ -1427,11 +1427,11 @@ VOID MY_DELETE_IMAGE(VOID)
 BOOL MY_LOAD_MUSIC(VOID)
 {
 
-	strcpy_s(BGM_TITLE.path, MUSIC_BGM_TITLE_PATH);				
-	BGM_TITLE.handle = LoadSoundMem(BGM_TITLE.path);			
+	strcpy_s(BGM_TITLE.path, MUSIC_BGM_TITLE_PATH);
+	BGM_TITLE.handle = LoadSoundMem(BGM_TITLE.path);
 	if (BGM_TITLE.handle == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), MUSIC_BGM_TITLE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
@@ -1446,11 +1446,11 @@ BOOL MY_LOAD_MUSIC(VOID)
 	}
 
 	//プレイヤーのショット音
-	strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);			
-	player.musicShot.handle = LoadSoundMem(player.musicShot.path);		
+	strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);
+	player.musicShot.handle = LoadSoundMem(player.musicShot.path);
 	if (player.musicShot.handle == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), MUSIC_PLAYER_SHOT_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
@@ -1469,15 +1469,15 @@ VOID MY_DELETE_MUSIC(VOID)
 
 BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 {
-	
+
 	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
-			
+
 			if (MY_CHECK_RECT_COLL(player, mapColl[tate][yoko]) == TRUE)
 			{
-				
+
 				if (map[tate][yoko].kind == k) { return TRUE; }
 			}
 		}
@@ -1495,8 +1495,8 @@ BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
 		a.bottom > b.top
 		)
 	{
-		return TRUE;	
+		return TRUE;
 	}
 
-	return FALSE;		
+	return FALSE;
 }
