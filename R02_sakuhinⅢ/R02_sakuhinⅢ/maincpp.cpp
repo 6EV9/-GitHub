@@ -12,7 +12,7 @@
 #define GAME_FPS			60
 
 
-#define MOUSE_BUTTON_CODE	129		
+//#define MOUSE_BUTTON_CODE	129		
 
 
 #define PATH_MAX			255	
@@ -163,8 +163,8 @@ typedef struct STRUCT_MOUSE
 	int WheelValue = 0;
 	iPOINT Point;
 	iPOINT OldPoint;
-	int OldButton[MOUSE_BUTTON_CODE] = { 0 };
-	int Button[MOUSE_BUTTON_CODE] = { 0 };
+	//int OldButton[MOUSE_BUTTON_CODE] = { 0 };
+	//int Button[MOUSE_BUTTON_CODE] = { 0 };
 }MOUSE;
 
 
@@ -619,80 +619,80 @@ BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
 	}
 }
 
-VOID MY_MOUSE_UPDATE(VOID)
-{
-	
-	mouse.OldPoint = mouse.Point;
-
-	
-	for (int i = 0; i < MOUSE_BUTTON_CODE; i++) { mouse.OldButton[i] = mouse.Button[i]; }
-
-	
-	GetMousePoint(&mouse.Point.x, &mouse.Point.y);
-
-
-	mouse.InputValue = GetMouseInput();
-
-	
-	if ((mouse.InputValue & MOUSE_INPUT_LEFT) == MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT]++; }		
-	if ((mouse.InputValue & MOUSE_INPUT_LEFT) != MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT] = 0; }		
-
-	
-	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) == MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE]++; }	
-	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) != MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE] = 0; }	
-
-	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) == MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT]++; }		
-	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) != MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT] = 0; }	
-	
-	mouse.WheelValue = GetMouseWheelRotVol();
-
-	return;
-}
-
-
-BOOL MY_MOUSE_DOWN(int MOUSE_INPUT_)
-{
-	
-	if (mouse.Button[MOUSE_INPUT_] != 0)
-	{
-		return TRUE;	
-	}
-	else
-	{
-		return FALSE;	
-	}
-}
-
-
-BOOL MY_MOUSE_UP(int MOUSE_INPUT_)
-{
-	if (mouse.OldButton[MOUSE_INPUT_] >= 1	
-		&& mouse.Button[MOUSE_INPUT_] == 0)
-	{
-		return TRUE;	
-	}
-	else
-	{
-		return FALSE;	
-	}
-}
-
-
-
-BOOL MY_MOUSEDOWN_KEEP(int MOUSE_INPUT_, int DownTime)
-{
-
-	int UpdateTime = DownTime * GAME_FPS;
-
-	if (mouse.Button[MOUSE_INPUT_] > UpdateTime)
-	{
-		return TRUE;	
-	}
-	else
-	{
-		return FALSE;	
-	}
-}
+//VOID MY_MOUSE_UPDATE(VOID)
+//{
+//	
+//	mouse.OldPoint = mouse.Point;
+//
+//	
+//	for (int i = 0; i < MOUSE_BUTTON_CODE; i++) { mouse.OldButton[i] = mouse.Button[i]; }
+//
+//	
+//	GetMousePoint(&mouse.Point.x, &mouse.Point.y);
+//
+//
+//	mouse.InputValue = GetMouseInput();
+//
+//	
+//	if ((mouse.InputValue & MOUSE_INPUT_LEFT) == MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT]++; }		
+//	if ((mouse.InputValue & MOUSE_INPUT_LEFT) != MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT] = 0; }		
+//
+//	
+//	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) == MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE]++; }	
+//	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) != MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE] = 0; }	
+//
+//	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) == MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT]++; }		
+//	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) != MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT] = 0; }	
+//	
+//	mouse.WheelValue = GetMouseWheelRotVol();
+//
+//	return;
+//}
+//
+//
+//BOOL MY_MOUSE_DOWN(int MOUSE_INPUT_)
+//{
+//	
+//	if (mouse.Button[MOUSE_INPUT_] != 0)
+//	{
+//		return TRUE;	
+//	}
+//	else
+//	{
+//		return FALSE;	
+//	}
+//}
+//
+//
+//BOOL MY_MOUSE_UP(int MOUSE_INPUT_)
+//{
+//	if (mouse.OldButton[MOUSE_INPUT_] >= 1	
+//		&& mouse.Button[MOUSE_INPUT_] == 0)
+//	{
+//		return TRUE;	
+//	}
+//	else
+//	{
+//		return FALSE;	
+//	}
+//}
+//
+//
+//
+//BOOL MY_MOUSEDOWN_KEEP(int MOUSE_INPUT_, int DownTime)
+//{
+//
+//	int UpdateTime = DownTime * GAME_FPS;
+//
+//	if (mouse.Button[MOUSE_INPUT_] > UpdateTime)
+//	{
+//		return TRUE;	
+//	}
+//	else
+//	{
+//		return FALSE;	
+//	}
+//}
 
 
 
@@ -898,45 +898,7 @@ VOID MY_PLAY_PROC(VOID)
 		
 		(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
-	if (mouse.Button[MOUSE_INPUT_RIGHT] == TRUE)
-	{
 	
-		iPOINT R_ClickPt = mouse.Point;
-
-		//マウスを表示
-		SetMouseDispFlag(TRUE);
-
-		//終了ダイアログを表示
-		int Ret = MessageBox(GetMainWindowHandle(), MOUSE_R_CLICK_CAPTION, MOUSE_R_CLICK_TITLE, MB_YESNO);
-
-		if (Ret == IDYES)		
-		{
-			
-			GameScene = GAME_SCENE_START;
-			return;
-
-		}
-		else if (Ret == IDNO)	
-		{
-			
-			SetMousePoint(R_ClickPt.x, R_ClickPt.y);
-
-			
-			SetMouseDispFlag(FALSE);
-		}
-	}
-
-	
-
-	
-	if (mouse.Point.x >= 0 && mouse.Point.x <= GAME_WIDTH
-		&& mouse.Point.y >= 0 && mouse.Point.y <= GAME_HEIGHT)
-	{
-		
-		player.CenterX = mouse.Point.x;
-		player.CenterY = mouse.Point.y;
-	}
-
 
 	player.coll.left = player.CenterX - mapChip.width / 2 + 5;
 	player.coll.top = player.CenterY - mapChip.height / 2 + 5;
