@@ -107,8 +107,8 @@ enum GAME_MAP_KIND
 {
 	n = -1,	//(NONE)未定
 	k = 10,	//壁
-	k2 = 11,
-	k3 = 13,
+	k2 = 11,//壁
+	k3 = 13,//壁
 
 	t = 33,	//通路
 	s = 32,	//スタート
@@ -136,17 +136,17 @@ enum CHARA_RELOAD {
 
 typedef struct STRUCT_TAMA
 {
-	char path[PATH_MAX];				//パス
-	int handle[TAMA_DIV_NUM];			//分割したの弾の画像ハンドルを取得
-	int x;								//X位置
-	int y;								//Y位置
-	int width;							//幅
-	int height;							//高さ
-	BOOL IsDraw;						//弾を表示できるか
-	int nowImageKind;					//弾の現在の画像
-	int changeImageCnt;					//画像を変えるためのカウント
-	int changeImageCntMAX;				//画像を変えるためのカウント(MAX)
-	int speed;							//スピード
+	char path[PATH_MAX];				
+	int handle[TAMA_DIV_NUM];			
+	int x;								
+	int y;								
+	int width;							
+	int height;							
+	BOOL IsDraw;						
+	int nowImageKind;					
+	int changeImageCnt;					
+	int changeImageCntMAX;				
+	int speed;							
 }TAMA;
 
 
@@ -170,12 +170,12 @@ typedef struct STRUCT_MOUSE
 
 typedef struct STRUCT_FONT
 {
-	char path[PATH_MAX];		//パス
-	char name[NAME_MAX];		//フォント名
-	int handle;					//ハンドル
-	int size;					//大きさ
-	int bold;					//太さ
-	int type;					//タイプ
+	char path[PATH_MAX];		
+	char name[NAME_MAX];		
+	int handle;					
+	int size;					
+	int bold;					
+	int type;					
 
 
 }FONT;
@@ -331,15 +331,15 @@ VOID MY_FPS_UPDATE(VOID);
 VOID MY_FPS_DRAW(VOID);
 VOID MY_FPS_WAIT(VOID);
 
-VOID MY_ALL_KEYDOWN_UPDATE(VOID);	//キーの入力状態を更新する
-BOOL MY_KEY_DOWN(int);				//キーを押しているか、キーコードで判断する
-BOOL MY_KEY_UP(int);				//キーを押し上げたか、キーコードで判断する
-BOOL MY_KEYDOWN_KEEP(int, int);		//キーを押し続けているか、キーコードで判断する
+VOID MY_ALL_KEYDOWN_UPDATE(VOID);	
+BOOL MY_KEY_DOWN(int);				
+BOOL MY_KEY_UP(int);				
+BOOL MY_KEYDOWN_KEEP(int, int);		
 
-//VOID MY_MOUSE_UPDATE(VOID);			//マウスの入力情報を更新する
-//BOOL MY_MOUSE_DOWN(int);			//ボタンを押しているか、マウスコードで判断する
-//BOOL MY_MOUSE_UP(int);				//ボタンを押し上げたか、マウスコードで判断する
-//BOOL MY_MOUSEDOWN_KEEP(int, int);	//ボタンを押し続けているか、マウスコードで判断する
+//VOID MY_MOUSE_UPDATE(VOID);			
+//BOOL MY_MOUSE_DOWN(int);			
+//BOOL MY_MOUSE_UP(int);				
+//BOOL MY_MOUSEDOWN_KEEP(int, int);	
 
 BOOL MY_FONT_INSTALL_ONCE(VOID);
 VOID MY_FONT_UNINSTALL_ONCE(VOID);
@@ -509,7 +509,7 @@ VOID MY_FPS_UPDATE(VOID)
 		StartTimeFps = GetNowCount();
 	}
 
-	if (CountFps == SampleNumFps) //60フレーム目なら平均を計算
+	if (CountFps == SampleNumFps)
 	{
 		int now = GetNowCount();
 
@@ -532,12 +532,12 @@ VOID MY_FPS_DRAW(VOID)
 
 VOID MY_FPS_WAIT(VOID)
 {
-	int resultTime = GetNowCount() - StartTimeFps;					//かかった時間
-	int waitTime = CountFps * 1000 / GAME_FPS - resultTime;	//待つべき時間
+	int resultTime = GetNowCount() - StartTimeFps;					
+	int waitTime = CountFps * 1000 / GAME_FPS - resultTime;	
 
-	if (waitTime > 0)		//指定のFPS値よりも早い場合
+	if (waitTime > 0)		
 	{
-		WaitTimer(waitTime);	//待つ
+		WaitTimer(waitTime);	
 	}
 	return;
 }
@@ -547,62 +547,59 @@ VOID MY_ALL_KEYDOWN_UPDATE(VOID)
 {
 	
 
-	char TempKey[256];	//一時的に、現在のキーの入力状態を格納する
+	char TempKey[256];
 
-	//直前のキー入力をとっておく
+	
 	for (int i = 0; i < 256; i++)
 	{
 		OldAllKeyState[i] = AllKeyState[i];
 	}
 
-	GetHitKeyStateAll(TempKey); // 全てのキーの入力状態を得る
+	GetHitKeyStateAll(TempKey);
 
 	for (int i = 0; i < 256; i++)
 	{
-		if (TempKey[i] != 0)	//押されているキーのキーコードを押しているとき
+		if (TempKey[i] != 0)	
 		{
-			AllKeyState[i]++;	//押されている
+			AllKeyState[i]++;	
 		}
 		else
 		{
-			AllKeyState[i] = 0;	//押されていない
+			AllKeyState[i] = 0;	
 		}
 	}
 	return;
 }
 
-//キーを押しているか、キーコードで判断する
-//引　数：int：キーコード：KEY_INPUT_???
+
 BOOL MY_KEY_DOWN(int KEY_INPUT_)
 {
-	//キーコードのキーを押している時
+	
 	if (AllKeyState[KEY_INPUT_] != 0)
 	{
-		return TRUE;	//キーを押している
+		return TRUE;	
 	}
 	else
 	{
-		return FALSE;	//キーを押していない
+		return FALSE;	
 	}
 }
 
-//キーを押し上げたか、キーコードで判断する
-//int：キーコード：KEY_INPUT_
+
 BOOL MY_KEY_UP(int KEY_INPUT_)
 {
-	if (OldAllKeyState[KEY_INPUT_] >= 1	//直前は押していて
-		&& AllKeyState[KEY_INPUT_] == 0)	//今は押していないとき
+	if (OldAllKeyState[KEY_INPUT_] >= 1	
+		&& AllKeyState[KEY_INPUT_] == 0)	
 	{
-		return TRUE;	//キーを押し上げている
+		return TRUE;	
 	}
 	else
 	{
-		return FALSE;	//キーを押し上げていない
+		return FALSE;	
 	}
 }
 
-//キーを押し続けているか、キーコードで判断する
-//キーコード：KEY_INPUT_???
+
 
 BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
 {
@@ -611,14 +608,15 @@ BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
 
 	if (AllKeyState[KEY_INPUT_] > UpdateTime)
 	{
-		return TRUE;	//押し続けている
+		return TRUE;	
 	}
 	else
 	{
-		return FALSE;	//押し続けていない
+		return FALSE;	
 	}
 }
 
+//マウス
 //VOID MY_MOUSE_UPDATE(VOID)
 //{
 //	
@@ -794,20 +792,20 @@ VOID MY_START_PROC(VOID)
 
 
 
-	//タイトルロゴを拡大
+	
 	if (ImageTitleROGO.rate < ImageTitleROGO.rateMAX)
 	{
 		ImageTitleROGO.rate += IMAGE_TITLE_ROGO_ROTA;
 	}
 
-	//タイトルロゴを移動
+	
 	if (ImageTitleROGO.image.x < GAME_WIDTH / 2)
 	{
 		ImageTitleROGO.image.x += IMAGE_TITLE_ROGO_X_SPEED;
 	}
 	else
 	{
-		//タイトルロゴが移動しきったら
+		
 
 		
 		if (ImageTitleSTART.Cnt < ImageTitleSTART.CntMAX)
@@ -845,7 +843,7 @@ VOID MY_START_DRAW(VOID)
 		ImageTitleROGO.angle,							
 		ImageTitleROGO.image.handle, TRUE);				
 
-	//点滅
+	
 	if (ImageTitleSTART.IsDraw == TRUE)
 	{
 		//タイトルスタートの描画
@@ -1218,8 +1216,8 @@ VOID MY_PLAY_DRAW(VOID)
 	//プレイヤーを描画する(画像を拡大回転して描画※処理負荷が高い！多用に注意！)
 	DrawRotaGraph(
 		player.image.x, player.image.y,
-		2.0,							//拡大率
-		DX_PI * 2 / 4 * 2,				//回転率(ラジアン)　※円を４分割して、考えよう！
+		2.0,							
+		DX_PI * 2 / 4 * 2,				
 		player.image.handle, TRUE);
 	*/
 
