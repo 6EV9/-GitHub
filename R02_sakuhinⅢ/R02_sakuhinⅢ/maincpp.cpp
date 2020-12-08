@@ -249,7 +249,7 @@ typedef struct STRUCT_MAP_IMAGE
 	int kind[MAP_DIV_NUM];				
 	int width;							
 	int height;							
-}MAPCHIP;	//MAP_IMAGE構造体
+}MAPCHIP;	
 
 typedef struct STRUCT_MAP
 {
@@ -321,7 +321,6 @@ MAPCHIP mapChip;
 
 
 MAP map[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
-
 
 iPOINT startPt{ -1,-1 };
 
@@ -416,6 +415,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	SetDrawScreen(DX_SCREEN_BACK);	
 
+
+
+
+
+	
 	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
@@ -432,7 +436,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 		if (startPt.x != -1 && startPt.y != -1) { break; }
 	}
-
+	
 
 	if (startPt.x == -1 && startPt.y == -1)
 	{
@@ -616,81 +620,7 @@ BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
 	}
 }
 
-//マウス
-//VOID MY_MOUSE_UPDATE(VOID)
-//{
-//	
-//	mouse.OldPoint = mouse.Point;
-//
-//	
-//	for (int i = 0; i < MOUSE_BUTTON_CODE; i++) { mouse.OldButton[i] = mouse.Button[i]; }
-//
-//	
-//	GetMousePoint(&mouse.Point.x, &mouse.Point.y);
-//
-//
-//	mouse.InputValue = GetMouseInput();
-//
-//	
-//	if ((mouse.InputValue & MOUSE_INPUT_LEFT) == MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT]++; }		
-//	if ((mouse.InputValue & MOUSE_INPUT_LEFT) != MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT] = 0; }		
-//
-//	
-//	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) == MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE]++; }	
-//	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) != MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE] = 0; }	
-//
-//	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) == MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT]++; }		
-//	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) != MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT] = 0; }	
-//	
-//	mouse.WheelValue = GetMouseWheelRotVol();
-//
-//	return;
-//}
-//
-//
-//BOOL MY_MOUSE_DOWN(int MOUSE_INPUT_)
-//{
-//	
-//	if (mouse.Button[MOUSE_INPUT_] != 0)
-//	{
-//		return TRUE;	
-//	}
-//	else
-//	{
-//		return FALSE;	
-//	}
-//}
-//
-//
-//BOOL MY_MOUSE_UP(int MOUSE_INPUT_)
-//{
-//	if (mouse.OldButton[MOUSE_INPUT_] >= 1	
-//		&& mouse.Button[MOUSE_INPUT_] == 0)
-//	{
-//		return TRUE;	
-//	}
-//	else
-//	{
-//		return FALSE;	
-//	}
-//}
-//
-//
-//
-//BOOL MY_MOUSEDOWN_KEEP(int MOUSE_INPUT_, int DownTime)
-//{
-//
-//	int UpdateTime = DownTime * GAME_FPS;
-//
-//	if (mouse.Button[MOUSE_INPUT_] > UpdateTime)
-//	{
-//		return TRUE;	
-//	}
-//	else
-//	{
-//		return FALSE;	
-//	}
-//}
+
 
 
 
@@ -761,7 +691,14 @@ VOID MY_START(VOID)
 VOID MY_START_PROC(VOID)
 {	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
+	SetMouseDispFlag(FALSE);
+	player.CenterX = startPt.x;
+	player.CenterY = startPt.y;
 
+
+	player.image.x = player.CenterX;
+	player.image.y = player.CenterY;
+	SetMousePoint(player.image.x, player.image.y);
 
 		if (CheckSoundMem(BGM_TITLE.handle) != 0)
 		{
@@ -876,15 +813,7 @@ VOID MY_PLAY_PROC(VOID)
 			StopSoundMem(BGM.handle);	//BGMを止める
 		}
 
-		SetMouseDispFlag(TRUE);
-
-		player.CenterX = startPt.x;
-		player.CenterY = startPt.y;
-
-		player.image.x = player.CenterX;
-		player.image.y = player.CenterY;
-
-		SetMousePoint(player.image.x, player.image.y);
+		
 
 		GameScene = GAME_SCENE_END;
 		return;
@@ -903,12 +832,7 @@ VOID MY_PLAY_PROC(VOID)
 		(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
 	
-
-	player.coll.left = player.CenterX - mapChip.width / 2 + 5;
-	player.coll.top = player.CenterY - mapChip.height / 2 + 5;
-	player.coll.right = player.CenterX + mapChip.width / 2 - 5;
-	player.coll.bottom = player.CenterY + mapChip.height / 2 - 5;
-
+    
 	BOOL IsMove = TRUE;
 
 	
@@ -918,21 +842,7 @@ VOID MY_PLAY_PROC(VOID)
 		IsMove = FALSE;
 	}
 
-	if (IsMove == TRUE)
-	{
 	
-		if (mouse.Point.x >= 0 && mouse.Point.x <= GAME_WIDTH
-			&& mouse.Point.y >= 0 && mouse.Point.y <= GAME_HEIGHT)
-		{
-			
-			player.image.x = player.CenterX - player.image.width / 2;
-			player.image.y = player.CenterY - player.image.height / 2;
-
-		
-			player.collBeforePt.x = player.CenterX;
-			player.collBeforePt.y = player.CenterY;
-		}
-	}
 
 	if (MY_KEY_DOWN(KEY_INPUT_UP))
 	{
@@ -965,7 +875,9 @@ VOID MY_PLAY_PROC(VOID)
 	{
 		player.CenterX -= CHARA_SPEED_MIDI;
 	}
-	else if (KEY_INPUT_LEFT)
+	else if (KEY_INPUT_LEFT) {
+
+	}
 		if(player.CenterX < GAME_WIDTH/2)
 		{
 			player.CenterX += CHARA_SPEED_MIDI;
@@ -984,10 +896,10 @@ VOID MY_PLAY_PROC(VOID)
 	}
 
 
-	player.coll.left = player.CenterX - mapChip.width / 2 + 5;
+	player.coll.left = player.CenterX - mapChip.width / 2 + 15;
 	player.coll.top = player.CenterY - mapChip.height / 2 + 5;
-	player.coll.right = player.CenterX + mapChip.width / 2 + 5;
-	player.coll.bottom = player.CenterX + mapChip.width / 2 + 5;
+	player.coll.right = player.CenterX + mapChip.width / 2 - 15;
+	player.coll.bottom = player.CenterY + mapChip.height / 2 - 10;
 
 
 
@@ -1090,10 +1002,6 @@ VOID MY_PLAY_DRAW(VOID)
 				mapChip.handle[map[tate][yoko].kind],
 				TRUE);
 		}
-	}
-
-	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
-	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
 			//壁ならば
@@ -1109,6 +1017,8 @@ VOID MY_PLAY_DRAW(VOID)
 			}
 		}
 	}
+
+	
 	DrawGraph(player.image.x, player.image.y, player.image.handle, TRUE);
 
 	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
@@ -1164,12 +1074,12 @@ VOID MY_PLAY_DRAW(VOID)
 		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,						
 		&mapChip.handle[0]);								
 
-	//if (mapRes == -1)
-	//{
-	//	//エラーメッセージ表示
-	//	MessageBox(GetMainWindowHandle(), GAME_MAP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-	//	return FALSE;
-	//}
+	if (mapRes == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), GAME_MAP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return;
+	}
 
 	
 	GetGraphSize(mapChip.handle[0], &mapChip.width, &mapChip.height);
