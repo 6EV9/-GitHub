@@ -39,6 +39,22 @@
 #define IMAGE_TITLE_START_CNT		1			
 #define IMAGE_TITLE_START_CNT_MAX	30			
 
+#define TAMA_CHANGE_MAX 5
+#define TAMA_MAX       16
+
+#define TAMA_CHANGE_MAX		 5	//5フレーム目で弾の画像を変える
+#define TAMA_MAX			16	//最大16発まで
+
+#define TAMA_RED_PATH			TEXT(".\\IMAGE\\tama.png")		//赤弾の画像
+
+#define TAMA_DIV_WIDTH		16	//画像を分割する幅サイズ
+#define TAMA_DIV_HEIGHT		16	//画像を分割する高さサイズ
+
+#define TAMA_DIV_TATE		3	//画像を縦に分割する数
+#define TAMA_DIV_YOKO		1	//画像を横に分割する数
+
+#define TAMA_DIV_NUM	TAMA_DIV_TATE * TAMA_DIV_YOKO
+
 #define MUSIC_LOAD_ERR_TITLE TEXT("音楽読み込みエラー")
 
 #define MUSIC_BGM_PATH            TEXT(".\\MUSIC\\BGMpaly.mp3")
@@ -194,15 +210,21 @@ typedef struct STRUCT_CHARA
 	int y;
 	int width;
 	int height;
+	MUSIC musicShot;
+
+	BOOL CanShot;				
+	int ShotReLoadCnt;			
+	int ShotReLoadCntMAX;
+
 
 	int CenterX;
 	int CenterY;
 
 	int speed;
-
+	TAMA tama[TAMA_MAX];
 	
 	RECT coll;
-
+	
 
 }CHARA;
 
@@ -366,6 +388,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (MY_LOAD_IMAGE() == FALSE) { return -1; }
 
 	if (MY_LOAD_MUSIC() == FALSE) { return -1; }
+	player.CanShot = TRUE;
+	player.ShotReLoadCnt = 0;
+	player.ShotReLoadCntMAX = CHARA_RELOAD_LOW;
 
 	if (MY_FONT_INSTALL_ONCE() == FALSE) { return -1; }
 	
@@ -607,7 +632,7 @@ VOID MY_START(VOID)
 	
 //スタート画面の処理
 VOID MY_START_PROC(VOID)
-{
+{     //エンターキーを押したら、プレイシーン
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
 		//プレイヤーの最初の位置
@@ -633,8 +658,7 @@ VOID MY_START_PROC(VOID)
 		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
 	}
 
-
-
+	
 
 
 
@@ -806,12 +830,58 @@ VOID MY_PLAY_PROC(VOID)
 	player.coll.right = player.CenterX + mapChip.width / 2 - 15;
 	player.coll.bottom = player.CenterY + mapChip.height / 2 - 10;
 
+//スペースキーで球が出る
+	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+	{
+
+		if (player.CanShot == TRUE)
+		{
+
+			PlaySoundMem(player.musicShot.handle, DX_PLAYTYPE_BACK);
+			player.CanShot = FALSE;
+
+			for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+			{
+				if (player.tama[cnt].IsDraw == FALSE)
+				{
+
+					player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
+
+
+					player.tama[cnt].y = player.y;
+
+
+					player.tama[cnt].IsDraw = TRUE;
+
+					break;
+				}
+			}
+		
+		}
+	}
+
+
+
+	
+	if (player.CanShot == FALSE)
+	{
+		
+		if (player.ShotReLoadCnt == player.ShotReLoadCntMAX)
+		{
+			player.ShotReLoadCnt = 0;
+			player.CanShot = TRUE;		
+		}
+
+		player.ShotReLoadCnt++;	//リロードする
+	}
+
 	//当たり判定
 	if (MY_CHECK_MAP1_PLAYER_COLL(player.coll) == TRUE)
 	{
 		GameScene = GAME_SCENE_END;
 		return;
 	}
+	
 
 	
 	return;
@@ -858,6 +928,51 @@ VOID MY_PLAY_DRAW(VOID)
 			}
 		}
 	}
+
+	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+	{
+
+		if (player.tama[cnt].IsDraw == TRUE)
+		{
+
+			DrawGraph(
+				player.tama[cnt].x,
+				player.tama[cnt].y,
+				player.tama[cnt].handle[player.tama[cnt].nowImageKind],
+				TRUE);
+
+
+			if (player.tama[cnt].changeImageCnt < player.tama[cnt].changeImageCntMAX)
+			{
+				player.tama[cnt].changeImageCnt++;
+			}
+			else
+			{
+
+				if (player.tama[cnt].nowImageKind < TAMA_DIV_NUM - 1)
+				{
+					player.tama[cnt].nowImageKind++;
+				}
+				else
+				{
+					player.tama[cnt].nowImageKind = 0;
+				}
+
+				player.tama[cnt].changeImageCnt = 0;
+			}
+
+
+			if (player.tama[cnt].y < 0)
+			{
+				player.tama[cnt].IsDraw = FALSE;
+			}
+			else
+			{
+				player.tama[cnt].y -= player.tama[cnt].speed;
+			}
+		}
+	}
+
 //プレイヤー描画
 	DrawGraph(player.x, player.y, player.handle, TRUE);
 	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
@@ -980,6 +1095,67 @@ BOOL MY_LOAD_IMAGE(VOID)
 	player.CenterY = player.y + player.height / 2;
 	player.speed = CHARA_SPEED_LOW;
 
+	int tamaRedRes = LoadDivGraph(
+		TAMA_RED_PATH,									
+		TAMA_DIV_NUM, TAMA_DIV_TATE, TAMA_DIV_YOKO,			
+		TAMA_DIV_WIDTH, TAMA_DIV_HEIGHT,					
+		&player.tama[0].handle[0]);							
+
+
+	if (tamaRedRes == -1)
+	{
+
+		MessageBox(GetMainWindowHandle(), TAMA_RED_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+
+	GetGraphSize(player.tama[0].handle[0], &player.tama[0].width, &player.tama[0].height);
+
+
+	for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+	{
+
+		strcpyDx(player.tama[cnt].path, TEXT(TAMA_RED_PATH));
+
+		for (int i_num = 0; i_num < TAMA_DIV_NUM; i_num++)
+		{
+
+			player.tama[cnt].handle[i_num] = player.tama[0].handle[i_num];
+		}
+
+
+		player.tama[cnt].width = player.tama[0].width;
+
+
+		player.tama[cnt].height = player.tama[0].height;
+
+
+		player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
+
+
+		player.tama[cnt].y = player.y;
+
+
+		player.tama[cnt].IsDraw = FALSE;
+
+
+		player.tama[cnt].changeImageCnt = 0;
+
+
+		player.tama[cnt].changeImageCntMAX = TAMA_CHANGE_MAX;
+
+
+		player.tama[cnt].nowImageKind = 0;
+
+
+		player.tama[cnt].speed = CHARA_SPEED_LOW;
+	}
+
+
+
+
+
 	int mapRes = LoadDivGraph(
 		GAME_MAP_PATH,										
 		MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,			
@@ -1041,7 +1217,7 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(ImageTitleBK.handle);
 	DeleteGraph(ImageTitleROGO.image.handle);
 	DeleteGraph(ImageTitleSTART.image.handle);
-
+	for (int i_num = 0; i_num < TAMA_DIV_NUM; i_num++) { DeleteGraph(player.tama[0].handle[i_num]); }
 	for (int i_num = 0; i_num < MAP_DIV_NUM; i_num++) { DeleteGraph(mapChip.handle[i_num]); }
 
 	return;
@@ -1050,7 +1226,7 @@ VOID MY_DELETE_IMAGE(VOID)
 
 BOOL MY_LOAD_MUSIC(VOID)
 {
-
+	//タイトルBGM
 	strcpy_s(BGM_TITLE.path, MUSIC_BGM_TITLE_PATH);
 	BGM_TITLE.handle = LoadSoundMem(BGM_TITLE.path);
 	if (BGM_TITLE.handle == -1)
@@ -1059,13 +1235,22 @@ BOOL MY_LOAD_MUSIC(VOID)
 		MessageBox(GetMainWindowHandle(), MUSIC_BGM_TITLE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-
+	//プレイBGM
 	strcpy_s(BGM.path, MUSIC_BGM_PATH);
 	BGM.handle = LoadSoundMem(BGM.path);
 	if (BGM.handle == -1)
 	{
 
 		MessageBox(GetMainWindowHandle(), MUSIC_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	//ショットBGM
+	strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);			
+	player.musicShot.handle = LoadSoundMem(player.musicShot.path);		
+	if (player.musicShot.handle == -1)
+	{
+		
+		MessageBox(GetMainWindowHandle(), MUSIC_PLAYER_SHOT_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
 
@@ -1077,7 +1262,7 @@ VOID MY_DELETE_MUSIC(VOID)
 {
 	DeleteSoundMem(BGM.handle);
 	DeleteSoundMem(BGM_TITLE.handle);
-
+	DeleteSoundMem(player.musicShot.handle);
 	return;
 }
 //ステージ当たり判定
