@@ -122,6 +122,7 @@ enum GAME_MAP_KIND
 	k = 10,	//壁
 	k2 = 11,//壁
 	k3 = 13,//壁
+	b = 14,//浮遊物
 
 	t = 33,	//通路
 	s = 32,	//スタート
@@ -132,7 +133,7 @@ enum GAME_SCENE {
 	GAME_SCENE_START,
 	GAME_SCENE_PLAY,
 	GAME_SCENE_END,
-};	
+};
 
 enum CHARA_SPEED {
 	CHARA_SPEED_LOW = 1,
@@ -212,8 +213,8 @@ typedef struct STRUCT_CHARA
 	int height;
 	MUSIC musicShot;
 
-	BOOL CanShot;				
-	int ShotReLoadCnt;			
+	BOOL CanShot;
+	int ShotReLoadCnt;
 	int ShotReLoadCntMAX;
 
 
@@ -222,9 +223,9 @@ typedef struct STRUCT_CHARA
 
 	int speed;
 	TAMA tama[TAMA_MAX];
-	
+
 	RECT coll;
-	
+
 
 }CHARA;
 
@@ -254,20 +255,20 @@ typedef struct STRUCT_IMAGE_BLINK
 
 typedef struct STRUCT_MAP_IMAGE
 {
-	char path[PATH_MAX];				
-	int handle[MAP_DIV_NUM];			
-	int kind[MAP_DIV_NUM];				
-	int width;							
-	int height;							
-}MAPCHIP;	
+	char path[PATH_MAX];
+	int handle[MAP_DIV_NUM];
+	int kind[MAP_DIV_NUM];
+	int width;
+	int height;
+}MAPCHIP;
 
 typedef struct STRUCT_MAP
 {
-	GAME_MAP_KIND kind;			
-	int x;						
-	int y;						
-	int width;					
-	int height;					
+	GAME_MAP_KIND kind;
+	int x;
+	int y;
+	int width;
+	int height;
 }MAP;
 
 
@@ -315,12 +316,12 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
 		k,k,k,k,t,t,k,k,k,k,k,k,k,	// 2
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
-		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 4
+		k,t,b,t,t,t,t,t,t,t,t,t,k,	// 4
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 5
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
 		k,k,k,k,k,k,k,k,k,k,k,k,k,	// 8
-};	
+};
 
 
 GAME_MAP_KIND mapDataInit[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
@@ -393,7 +394,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	player.ShotReLoadCntMAX = CHARA_RELOAD_LOW;
 
 	if (MY_FONT_INSTALL_ONCE() == FALSE) { return -1; }
-	
+
 	if (MY_FONT_CREATE() == FALSE) { return -1; }
 
 	SetMouseDispFlag(TRUE);
@@ -629,21 +630,21 @@ VOID MY_START(VOID)
 
 	return;
 }
-	
+
 //スタート画面の処理
 VOID MY_START_PROC(VOID)
 {     //エンターキーを押したら、プレイシーン
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
 		//プレイヤーの最初の位置
-		player.CenterX = GAME_WIDTH  / 2;	//画面の中心
+		player.CenterX = GAME_WIDTH / 2;	//画面の中心
 		player.CenterY = GAME_HEIGHT / 2;	//画面の中心
 
 		player.x = player.CenterX - player.width / 2;
 		player.y = player.CenterY - player.height / 2;
 
 		GameScene = GAME_SCENE_PLAY;
-		
+
 		if (CheckSoundMem(BGM_TITLE.handle) != 0)
 		{
 			StopSoundMem(BGM_TITLE.handle);
@@ -658,7 +659,7 @@ VOID MY_START_PROC(VOID)
 		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
 	}
 
-	
+
 
 
 
@@ -830,7 +831,7 @@ VOID MY_PLAY_PROC(VOID)
 	player.coll.right = player.CenterX + mapChip.width / 2 - 15;
 	player.coll.bottom = player.CenterY + mapChip.height / 2 - 10;
 
-//スペースキーで球が出る
+	//スペースキーで球が出る
 	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 	{
 
@@ -856,20 +857,20 @@ VOID MY_PLAY_PROC(VOID)
 					break;
 				}
 			}
-		
+
 		}
 	}
 
 
 
-	
+
 	if (player.CanShot == FALSE)
 	{
-		
+
 		if (player.ShotReLoadCnt == player.ShotReLoadCntMAX)
 		{
 			player.ShotReLoadCnt = 0;
-			player.CanShot = TRUE;		
+			player.CanShot = TRUE;
 		}
 
 		player.ShotReLoadCnt++;	//リロードする
@@ -881,9 +882,9 @@ VOID MY_PLAY_PROC(VOID)
 		GameScene = GAME_SCENE_END;
 		return;
 	}
-	
 
-	
+
+
 	return;
 }
 
@@ -895,14 +896,14 @@ VOID MY_PLAY_DRAW(VOID)
 	//背景を描画
 	DrawGraph(ImageBack.x, ImageBack.y, ImageBack.handle, TRUE);
 
-	
+
 
 	//マップ描画
 	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
-			
+
 			DrawGraph(
 				map[tate][yoko].x,
 				map[tate][yoko].y,
@@ -919,6 +920,11 @@ VOID MY_PLAY_DRAW(VOID)
 			if (mapData[tate][yoko] == k)
 			{
 				DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, GetColor(0, 0, 255), FALSE);
+			}
+			//浮遊物
+			if (mapData[tate][yoko] == b)
+			{
+				DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, GetColor(0,255,0), FALSE);
 			}
 
 			//通路ならば
@@ -973,7 +979,7 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 	}
 
-//プレイヤー描画
+	//プレイヤー描画
 	DrawGraph(player.x, player.y, player.handle, TRUE);
 	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
 
@@ -1096,10 +1102,10 @@ BOOL MY_LOAD_IMAGE(VOID)
 	player.speed = CHARA_SPEED_LOW;
 
 	int tamaRedRes = LoadDivGraph(
-		TAMA_RED_PATH,									
-		TAMA_DIV_NUM, TAMA_DIV_TATE, TAMA_DIV_YOKO,			
-		TAMA_DIV_WIDTH, TAMA_DIV_HEIGHT,					
-		&player.tama[0].handle[0]);							
+		TAMA_RED_PATH,
+		TAMA_DIV_NUM, TAMA_DIV_TATE, TAMA_DIV_YOKO,
+		TAMA_DIV_WIDTH, TAMA_DIV_HEIGHT,
+		&player.tama[0].handle[0]);
 
 
 	if (tamaRedRes == -1)
@@ -1157,36 +1163,36 @@ BOOL MY_LOAD_IMAGE(VOID)
 
 
 	int mapRes = LoadDivGraph(
-		GAME_MAP_PATH,										
-		MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,			
-		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,						
-		&mapChip.handle[0]);								
+		GAME_MAP_PATH,
+		MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,
+		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,
+		&mapChip.handle[0]);
 
 	if (mapRes == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), GAME_MAP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
 
-	
+
 	GetGraphSize(mapChip.handle[0], &mapChip.width, &mapChip.height);
 
 	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
-			
+
 			mapDataInit[tate][yoko] = mapData[tate][yoko];
 
-			
+
 			map[tate][yoko].kind = mapData[tate][yoko];
 
-		
+
 			map[tate][yoko].width = mapChip.width;
 			map[tate][yoko].height = mapChip.height;
 
-			
+
 			map[tate][yoko].x = yoko * map[tate][yoko].width;
 			map[tate][yoko].y = tate * map[tate][yoko].height;
 		}
@@ -1245,11 +1251,11 @@ BOOL MY_LOAD_MUSIC(VOID)
 		return FALSE;
 	}
 	//ショットBGM
-	strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);			
-	player.musicShot.handle = LoadSoundMem(player.musicShot.path);		
+	strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);
+	player.musicShot.handle = LoadSoundMem(player.musicShot.path);
 	if (player.musicShot.handle == -1)
 	{
-		
+
 		MessageBox(GetMainWindowHandle(), MUSIC_PLAYER_SHOT_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
@@ -1277,7 +1283,8 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 			if (MY_CHECK_RECT_COLL(player, mapColl[tate][yoko]) == TRUE)
 			{
 
-				if (map[tate][yoko].kind == k) { return TRUE; }
+				if (map[tate][yoko].kind == k) { return TRUE; } //壁当たり判定
+				if (map[tate][yoko].kind == b) { return TRUE; }//
 			}
 		}
 	}
