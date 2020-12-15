@@ -37,7 +37,12 @@
 #define IMAGE_TITLE_ROGO_X_SPEED	1			
 #define IMAGE_TITLE_START_PATH		TEXT(".\\IMAGE\\ROGO.png")	
 #define IMAGE_TITLE_START_CNT		1			
-#define IMAGE_TITLE_START_CNT_MAX	30			
+#define IMAGE_TITLE_START_CNT_MAX	30	
+
+#define MUSIC_LOAD_ERR_TITLE TEXT("音楽読み込みエラー")
+
+#define MUSIC_BGM_PATH TEXT(".\\MUSIC\\BGMpaly.mp3")
+#define MUSIC_PLAYER_SHOT_PATH	TEXT(".\\MUSIC\\SHOT.mp3")
 
 #define TAMA_CHANGE_MAX 5
 #define TAMA_MAX       16
@@ -55,11 +60,7 @@
 
 #define TAMA_DIV_NUM	TAMA_DIV_TATE * TAMA_DIV_YOKO
 
-#define MUSIC_LOAD_ERR_TITLE TEXT("音楽読み込みエラー")
 
-#define MUSIC_BGM_PATH            TEXT(".\\MUSIC\\BGMpaly.mp3")
-#define MUSIC_PLAYER_SHOT_PATH TEXT(".\\MUSIC\\SHOT.mp3")
-#define MUSIC_BGM_TITLE_PATH		TEXT(".\\MUSIC\\BGMSTR.mp3")	
 
 #define GAME_MAP_TATE_MAX	9	
 #define GAME_MAP_YOKO_MAX	13	
@@ -198,8 +199,8 @@ typedef struct STRUCT_IMAGE
 
 typedef struct STRUCT_MUSIC
 {
-	char path[PATH_MAX];
-	int handle;
+	char path[PATH_MAX];		
+	int handle;					
 }MUSIC;
 
 
@@ -211,10 +212,10 @@ typedef struct STRUCT_CHARA
 	int y;
 	int width;
 	int height;
-	MUSIC musicShot;
+	MUSIC musicShot;			
 
-	BOOL CanShot;
-	int ShotReLoadCnt;
+	BOOL CanShot;				
+	int ShotReLoadCnt;			
 	int ShotReLoadCntMAX;
 
 
@@ -296,7 +297,7 @@ int GameScene;
 int PlayerX, PlayerY;
 int PlayerGraph;
 
-
+MUSIC BGM;
 
 IMAGE ImageTitleBK;
 IMAGE_ROTA ImageTitleROGO;
@@ -307,8 +308,7 @@ IMAGE ImageBack;
 CHARA player;
 
 
-MUSIC BGM;
-MUSIC BGM_TITLE;
+
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
@@ -366,8 +366,10 @@ VOID MY_END_DRAW(VOID);		//エンド画面の描画
 BOOL MY_LOAD_IMAGE(VOID);
 VOID MY_DELETE_IMAGE(VOID);
 
-BOOL MY_LOAD_MUSIC(VOID);
+//BGM
+BOOL MY_LOAD_MUSIC(VOID);		
 VOID MY_DELETE_MUSIC(VOID);
+
 //ステージ当たり判定
 BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);
 BOOL MY_CHECK_RECT_COLL(RECT, RECT);
@@ -441,8 +443,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	MY_DELETE_IMAGE();
 
-
 	MY_DELETE_MUSIC();
+
 
 	DxLib_End();
 
@@ -645,19 +647,10 @@ VOID MY_START_PROC(VOID)
 
 		GameScene = GAME_SCENE_PLAY;
 
-		if (CheckSoundMem(BGM_TITLE.handle) != 0)
-		{
-			StopSoundMem(BGM_TITLE.handle);
-		}
+	
 		return;
 	}
 
-	if (CheckSoundMem(BGM_TITLE.handle) == 0)
-	{
-
-		ChangeVolumeSoundMem(255 * 50 / 100, BGM_TITLE.handle);
-		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
-	}
 
 
 
@@ -743,14 +736,12 @@ VOID MY_PLAY_PROC(VOID)
 	//ESCキーを押したら、エンドシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
 	{
-
-
 		if (CheckSoundMem(BGM.handle) != 0)
 		{
-			StopSoundMem(BGM.handle);	//BGMを止める
+			StopSoundMem(BGM.handle);	
 		}
 
-
+		SetMouseDispFlag(TRUE);
 
 		GameScene = GAME_SCENE_END;
 		return;
@@ -758,16 +749,13 @@ VOID MY_PLAY_PROC(VOID)
 
 	if (CheckSoundMem(BGM.handle) == 0)
 	{
+		
+		ChangeVolumeSoundMem(255 * 50 / 100, BGM.handle);	
 
-		ChangeVolumeSoundMem(255 * 100 / 100, BGM.handle);	//50%の音量にする
-
-
-		//DX_PLAYTYPE_NORMAL:　ノーマル再生
-		//DX_PLAYTYPE_BACK  : バックグラウンド再生
-		//DX_PLAYTYPE_LOOP  : ループ再生
-
+	
 		PlaySoundMem(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
+
 
 	if (MY_KEY_DOWN(KEY_INPUT_UP))
 	{
@@ -983,7 +971,7 @@ VOID MY_PLAY_DRAW(VOID)
 	DrawGraph(player.x, player.y, player.handle, TRUE);
 	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
 
-	DrawString(0, 0, "プレイ画面(ESCキーを押して下さい)", GetColor(255, 255, 255));
+	/*DrawString(0, 0, "プレイ画面(ESCキーを押して下さい)", GetColor(255, 255, 255));*/
 	return;
 }
 
@@ -1230,47 +1218,7 @@ VOID MY_DELETE_IMAGE(VOID)
 }
 
 
-BOOL MY_LOAD_MUSIC(VOID)
-{
-	//タイトルBGM
-	strcpy_s(BGM_TITLE.path, MUSIC_BGM_TITLE_PATH);
-	BGM_TITLE.handle = LoadSoundMem(BGM_TITLE.path);
-	if (BGM_TITLE.handle == -1)
-	{
 
-		MessageBox(GetMainWindowHandle(), MUSIC_BGM_TITLE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-	//プレイBGM
-	strcpy_s(BGM.path, MUSIC_BGM_PATH);
-	BGM.handle = LoadSoundMem(BGM.path);
-	if (BGM.handle == -1)
-	{
-
-		MessageBox(GetMainWindowHandle(), MUSIC_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-	//ショットBGM
-	strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);
-	player.musicShot.handle = LoadSoundMem(player.musicShot.path);
-	if (player.musicShot.handle == -1)
-	{
-
-		MessageBox(GetMainWindowHandle(), MUSIC_PLAYER_SHOT_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
-
-VOID MY_DELETE_MUSIC(VOID)
-{
-	DeleteSoundMem(BGM.handle);
-	DeleteSoundMem(BGM_TITLE.handle);
-	DeleteSoundMem(player.musicShot.handle);
-	return;
-}
 //ステージ当たり判定
 BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 {
@@ -1284,7 +1232,7 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 			{
 
 				if (map[tate][yoko].kind == k) { return TRUE; } //壁当たり判定
-				if (map[tate][yoko].kind == b) { return TRUE; }//
+				if (map[tate][yoko].kind == b) { return TRUE; }//ビン当たり判定
 			}
 		}
 	}
@@ -1305,4 +1253,37 @@ BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
 	}
 
 	return FALSE;
+}
+BOOL MY_LOAD_MUSIC(VOID)
+{
+	//背景音楽
+	strcpy_s(BGM.path, MUSIC_BGM_PATH);		//パスの設定
+	BGM.handle = LoadSoundMem(BGM.path);	//読み込み
+	if (BGM.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), MUSIC_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	//プレイヤーのショット音
+	strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);			//パスの設定
+	player.musicShot.handle = LoadSoundMem(player.musicShot.path);		//読み込み
+	if (player.musicShot.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), MUSIC_PLAYER_SHOT_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+//音楽をまとめて削除する関数
+VOID MY_DELETE_MUSIC(VOID)
+{
+	DeleteSoundMem(BGM.handle);
+	DeleteSoundMem(player.musicShot.handle);
+
+	return;
 }
