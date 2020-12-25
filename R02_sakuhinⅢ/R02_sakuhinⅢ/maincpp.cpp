@@ -114,6 +114,9 @@
 #define KEY_RETURN_CLICK_TITLE		TEXT("ゲーム中断")
 #define KEY_RETURN_CLICK_CAPTION	TEXT("ゲームを中断し、タイトル画面に戻りますか？")
 
+#define STR_SCORE            TEXT("SCORE:XXXXX")
+
+
 enum GAME_MAP_KIND
 {
 	n = -1,	//(NONE)未定
@@ -312,13 +315,13 @@ CHARA player;
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 0
-		k,t,t,t,t,t,t,t,t,c,t,t,k,	// 1
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
 		k,k,k,k,t,t,k,k,k,k,k,k,k,	// 2
-		k,b,b,b,b,b,b,t,t,t,t,t,k,	// 3
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 4
-		k,b,b,b,b,b,t,t,t,t,t,t,k,	// 5
-		k,b,b,b,b,b,t,t,t,t,t,t,k,	// 6
-		k,b,b,b,b,b,t,t,t,t,t,t,k,	// 7
+		k,t,c,t,t,t,t,t,t,t,t,t,k,	// 5
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
 		k,k,k,k,k,k,k,k,k,k,k,k,k,	// 8
 };
 
@@ -374,6 +377,13 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player);
 BOOL MY_CHECK_RECT_COLL(RECT, RECT);
 
 VOID MY_CHECK_MAP1_TAMA_COLL(VOID);//弾当たり判定
+
+
+
+
+
+
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -1255,6 +1265,16 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 				//コイン当たり判定
 				if (map[tate][yoko].kind == c) { 
 
+
+					if (MY_CHECK_RECT_COLL(player, mapColl[tate][yoko]) == TRUE)
+					{
+						//ビン当たり判定
+						if (map[tate][yoko].kind == c)
+						{
+							map[tate][yoko].kind = t;
+						}
+					}
+
 					return FALSE;
 				}
 
@@ -1297,6 +1317,8 @@ VOID MY_CHECK_MAP1_TAMA_COLL(VOID)
 
 	return;
 }
+
+
 
 BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
 {
