@@ -287,13 +287,13 @@ char AllKeyState[256] = { '\0' };
 char OldAllKeyState[256] = { '\0' };
 
 
-
+int score;
 
 FONT FontTanu32;
 
 int GameScene;
 
-
+int GameScore;
 
 int PlayerX, PlayerY;
 int PlayerGraph;
@@ -485,6 +485,7 @@ VOID MY_FPS_DRAW(VOID)
 {
 
 	DrawFormatString(0, GAME_HEIGHT - 20, GetColor(255, 255, 255), "FPS:%.1f", CalcFps);
+	
 	return;
 }
 
@@ -991,6 +992,9 @@ VOID MY_PLAY_DRAW(VOID)
 	DrawGraph(player.x, player.y, player.handle, TRUE);
 	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
 
+
+	DrawFormatString(0, 0, GetColor(0, 0, 0), "スコア: %05d", GameScene);
+
 	/*DrawString(0, 0, "プレイ画面(ESCキーを押して下さい)", GetColor(255, 255, 255));*/
 	return;
 }
@@ -1272,11 +1276,14 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 						if (map[tate][yoko].kind == c)
 						{
 							map[tate][yoko].kind = t;
+							
 						}
+						score =+ 100;//スコア
 					}
 
 					return FALSE;
 				}
+
 
 			}
 		}
