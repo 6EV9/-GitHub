@@ -286,14 +286,14 @@ int SampleNumFps = GAME_FPS;
 char AllKeyState[256] = { '\0' };
 char OldAllKeyState[256] = { '\0' };
 
-
+//スコア
 int score;
 
 FONT FontTanu32;
 
 int GameScene;
 
-int GameScore;
+
 
 int PlayerX, PlayerY;
 int PlayerGraph;
@@ -317,10 +317,10 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 0
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
 		k,k,k,k,t,t,k,k,k,k,k,k,k,	// 2
-		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
+		k,t,t,t,t,t,t,t,t,t,b,t,k,	// 3
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 4
 		k,t,c,t,t,t,t,t,t,t,t,t,k,	// 5
-		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
+		k,t,t,t,t,t,c,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
 		k,k,k,k,k,k,k,k,k,k,k,k,k,	// 8
 };
@@ -992,8 +992,8 @@ VOID MY_PLAY_DRAW(VOID)
 	DrawGraph(player.x, player.y, player.handle, TRUE);
 	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
 
-
-	DrawFormatString(0, 0, GetColor(0, 0, 0), "スコア: %05d", GameScene);
+	//スコア
+	DrawFormatString(0, 0, GetColor(0, 0, 0), "スコア: %05d",score);
 
 	/*DrawString(0, 0, "プレイ画面(ESCキーを押して下さい)", GetColor(255, 255, 255));*/
 	return;
@@ -1276,9 +1276,9 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 						if (map[tate][yoko].kind == c)
 						{
 							map[tate][yoko].kind = t;
-							
+							score += 100;//スコア
 						}
-						score =+ 100;//スコア
+						
 					}
 
 					return FALSE;
