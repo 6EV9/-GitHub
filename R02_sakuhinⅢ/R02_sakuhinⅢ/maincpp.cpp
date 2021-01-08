@@ -765,13 +765,12 @@ VOID MY_PLAY_PROC(VOID)
 
 	if (CheckSoundMem(BGM.handle) == 0)
 	{
+		
+		ChangeVolumeSoundMem(255 * 50 / 100, BGM.handle);	
 
-		ChangeVolumeSoundMem(255 * 50 / 100, BGM.handle);
-
-
+	
 		PlaySoundMem(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
-
 
 	if (MY_KEY_DOWN(KEY_INPUT_UP))
 	{
@@ -1256,6 +1255,12 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 			{
 				//•Ç“–‚½‚è”»’è
 				if (map[tate][yoko].kind == k){
+					if (CheckSoundMem(BGM.handle) != 0)
+					{
+						StopSoundMem(BGM.handle);
+					}
+					SetMouseDispFlag(TRUE);		
+					GameScene = GAME_SCENE_END;
 
 					return TRUE;
 				}
@@ -1263,6 +1268,14 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 				//ƒrƒ““–‚½‚è”»’è
 				if (map[tate][yoko].kind == b) {
 
+					if (CheckSoundMem(BGM.handle) != 0)
+					{
+						StopSoundMem(BGM.handle);
+					}
+
+					SetMouseDispFlag(TRUE);		
+
+					GameScene = GAME_SCENE_END;
 					return TRUE;
 				}
 
