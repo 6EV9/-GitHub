@@ -119,12 +119,13 @@
 
 enum GAME_MAP_KIND
 {
-	n = -1,	//(NONE)未定
+	m = -1,	//(NONE)未定
 	k = 10,	//壁
 	k2 = 11,//壁
 	k3 = 13,//壁
 	b = 14,//浮遊物
 	c = 17,
+	c1 = 18,
 
 	t = 18,	//通路
 	s = 32,	//スタート
@@ -1285,7 +1286,7 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 
 					if (MY_CHECK_RECT_COLL(player, mapColl[tate][yoko]) == TRUE)
 					{
-						//ビン当たり判定
+						//コイン当たり判定
 						if (map[tate][yoko].kind == c)
 						{
 							map[tate][yoko].kind = t;
@@ -1296,6 +1297,7 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 
 					return FALSE;
 				}
+
 
 
 			}
@@ -1321,7 +1323,7 @@ VOID MY_CHECK_MAP1_TAMA_COLL(VOID)
 					ChechTama.top = player.tama[cnt].y;
 					ChechTama.right = player.tama[cnt].x + player.tama[cnt].width;
 					ChechTama.bottom = player.tama[cnt].y + player.tama[cnt].height;
-
+	
 					if (MY_CHECK_RECT_COLL(ChechTama, mapColl[tate][yoko]) == TRUE)
 					{
 						//ビン当たり判定
