@@ -95,7 +95,7 @@
 
 #define TAMA_DIV_NUM	TAMA_DIV_TATE * TAMA_DIV_YOKO
 
-#define GAME_MAP_TATE_MAX	9	
+#define GAME_MAP_TATE_MAX	(9 * 2)	
 #define GAME_MAP_YOKO_MAX	13	
 #define GAME_MAP_KIND_MAX	2	
 
@@ -294,7 +294,8 @@ FONT FontTanu32;
 
 int GameScene;
 
-
+//スクロールのスピード
+int scrollspeed = 1;
 
 int PlayerX, PlayerY;
 int PlayerGraph;
@@ -315,7 +316,7 @@ CHARA player;
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
-		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 0
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 0準備
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
 		k,k,k,k,t,t,k,k,k,k,k,k,k,	// 2
 		k,t,t,t,t,t,t,t,t,t,b,t,k,	// 3
@@ -323,7 +324,17 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 		k,t,c,t,t,t,t,t,t,t,t,t,k,	// 5
 		k,t,t,t,t,t,c,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
-		k,k,k,k,k,k,k,k,k,k,k,k,k,	// 8
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 8
+
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 0描画
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
+		k,k,k,k,t,t,k,k,k,k,k,k,k,	// 2
+		k,t,t,t,t,t,t,t,t,t,b,t,k,	// 3
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 4
+		k,t,c,t,t,t,t,t,t,t,t,t,k,	// 5
+		k,t,t,t,t,t,c,t,t,t,t,t,k,	// 6
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
+		k,k,k,k,k,k,k,k,k,k,k,k,k	// 8
 };
 
 
@@ -667,19 +678,32 @@ VOID MY_START_PROC(VOID)
 		//弾の位置を元に戻す
 		for (int cnt = 0; cnt < TAMA_MAX; cnt++)
 		{
-			
-
 				player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
-
-
 				player.tama[cnt].y = player.y;
-
-
 				player.tama[cnt].IsDraw = FALSE;
-
-	
-			
 		}
+
+		//マップを上にずらす
+		for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+		{
+			for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+			{
+
+				//位置を元に戻す
+				map[tate][yoko].y = tate * map[tate][yoko].height;
+
+				mapColl[tate][yoko].top = (tate + 0) * mapChip.height + 1;
+				mapColl[tate][yoko].bottom = (tate + 1) * mapChip.height - 1;
+
+				//マップを上にずらす
+				map[tate][yoko].y -= GAME_MAP_TATE_MAX / 2 * map[tate][yoko].height;
+
+				//当たり判定をずらす
+				mapColl[tate][yoko].top -= GAME_MAP_TATE_MAX / 2 * map[tate][yoko].height;
+				mapColl[tate][yoko].bottom -= GAME_MAP_TATE_MAX / 2 * map[tate][yoko].height;
+			}
+		}
+
 
 		GameScene = GAME_SCENE_PLAY;
 
@@ -841,6 +865,21 @@ VOID MY_PLAY_PROC(VOID)
 	if (player.x + player.width > GAME_WIDTH) { player.x = GAME_WIDTH - player.width; }
 	if (player.y < 0) { player.y = 0; }
 	if (player.y + player.height > GAME_HEIGHT) { player.y = GAME_HEIGHT - player.height; }
+
+
+	//マップのスクロール
+	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+		{
+			map[tate][yoko].y += scrollspeed;
+
+			//当たり判定をずらす
+			mapColl[tate][yoko].top += scrollspeed;
+			mapColl[tate][yoko].bottom += scrollspeed;
+		}
+	}
+
 
 	//プレイヤーの位置を更新
 	player.x = player.CenterX - player.width / 2;
