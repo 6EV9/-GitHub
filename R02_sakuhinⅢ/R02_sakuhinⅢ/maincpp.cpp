@@ -664,6 +664,23 @@ VOID MY_START_PROC(VOID)
 		player.x = player.CenterX - player.width / 2;
 		player.y = player.CenterY - player.height / 2;
 
+		//弾の位置を元に戻す
+		for (int cnt = 0; cnt < TAMA_MAX; cnt++)
+		{
+			
+
+				player.tama[cnt].x = player.CenterX - player.tama[cnt].width / 2;
+
+
+				player.tama[cnt].y = player.y;
+
+
+				player.tama[cnt].IsDraw = FALSE;
+
+	
+			
+		}
+
 		GameScene = GAME_SCENE_PLAY;
 
 		if (CheckSoundMem(BGM_TITLE.handle) != 0)
@@ -1225,22 +1242,6 @@ BOOL MY_LOAD_IMAGE(VOID)
 }
 
 
-VOID MY_DELETE_IMAGE(VOID)
-{
-
-	DeleteGraph(player.handle);
-
-
-
-	DeleteGraph(ImageTitleBK.handle);
-	DeleteGraph(ImageTitleROGO.image.handle);
-	DeleteGraph(ImageTitleSTART.image.handle);
-	for (int i_num = 0; i_num < TAMA_DIV_NUM; i_num++) { DeleteGraph(player.tama[0].handle[i_num]); }
-	for (int i_num = 0; i_num < MAP_DIV_NUM; i_num++) { DeleteGraph(mapChip.handle[i_num]); }
-
-	return;
-}
-
 
 
 //ステージ当たり判定
@@ -1330,6 +1331,9 @@ VOID MY_CHECK_MAP1_TAMA_COLL(VOID)
 						if (map[tate][yoko].kind == b)
 						{
 							map[tate][yoko].kind = t;
+							
+							player.tama[cnt].IsDraw = FALSE;
+
 						}
 					}
 				}
@@ -1355,6 +1359,25 @@ BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
 
 	return FALSE;
 }
+
+//画像をまとめて削除する関数
+VOID MY_DELETE_IMAGE(VOID)
+{
+
+	DeleteGraph(player.handle);
+
+
+
+	DeleteGraph(ImageTitleBK.handle);
+	DeleteGraph(ImageTitleROGO.image.handle);
+	DeleteGraph(ImageTitleSTART.image.handle);
+	for (int i_num = 0; i_num < TAMA_DIV_NUM; i_num++) { DeleteGraph(player.tama[0].handle[i_num]); }
+	for (int i_num = 0; i_num < MAP_DIV_NUM; i_num++) { DeleteGraph(mapChip.handle[i_num]); }
+
+	return;
+}
+
+
 BOOL MY_LOAD_MUSIC(VOID)
 {
 	//プレ画面BGM
