@@ -1,6 +1,6 @@
 ﻿  maincpp.cpp
 C:\Users\g19031\Desktop\作品\R02_作品Ⅲ\作品ⅢGitHub\R02_sakuhinⅢ\R02_sakuhinⅢ\maincpp.cpp(98,1): warning C4005: 'GAME_MAP_TATE_MAX': マクロが再定義されました。
 C:\Users\g19031\Desktop\作品\R02_作品Ⅲ\作品ⅢGitHub\R02_sakuhinⅢ\R02_sakuhinⅢ\maincpp.cpp(5): message : 'GAME_MAP_TATE_MAX' の以前の定義を確認してください
-C:\Users\g19031\Desktop\作品\R02_作品Ⅲ\作品ⅢGitHub\R02_sakuhinⅢ\R02_sakuhinⅢ\maincpp.cpp(408,6): warning C4101: 'Key': ローカル変数は 1 度も使われていません。
-C:\Users\g19031\Desktop\作品\R02_作品Ⅲ\作品ⅢGitHub\R02_sakuhinⅢ\R02_sakuhinⅢ\maincpp.cpp(1139,24): warning C4244: '=': 'double' から 'int' への変換です。データが失われる可能性があります。
+C:\Users\g19031\Desktop\作品\R02_作品Ⅲ\作品ⅢGitHub\R02_sakuhinⅢ\R02_sakuhinⅢ\maincpp.cpp(434,6): warning C4101: 'Key': ローカル変数は 1 度も使われていません。
+C:\Users\g19031\Desktop\作品\R02_作品Ⅲ\作品ⅢGitHub\R02_sakuhinⅢ\R02_sakuhinⅢ\maincpp.cpp(1198,24): warning C4244: '=': 'double' から 'int' への変換です。データが失われる可能性があります。
   R02_sakuhinⅢ.vcxproj -> C:\Users\g19031\Desktop\作品\R02_作品Ⅲ\作品ⅢGitHub\R02_sakuhinⅢ\Debug\R02_sakuhinⅢ.exe

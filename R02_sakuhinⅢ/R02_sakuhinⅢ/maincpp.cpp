@@ -95,7 +95,7 @@
 
 #define TAMA_DIV_NUM	TAMA_DIV_TATE * TAMA_DIV_YOKO
 
-#define GAME_MAP_TATE_MAX	(9 * 2)	
+#define GAME_MAP_TATE_MAX	(9 * 6)	
 #define GAME_MAP_YOKO_MAX	13	
 #define GAME_MAP_KIND_MAX	2	
 
@@ -136,6 +136,7 @@ enum GAME_SCENE {
 	GAME_SCENE_START,
 	GAME_SCENE_PLAY,
 	GAME_SCENE_END,
+	GAME_SCENE_Explanation
 };
 
 enum CHARA_SPEED {
@@ -316,11 +317,32 @@ CHARA player;
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
-		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 0準備
+		k,k,k,k,k,k,t,t,t,t,t,t,k,	// 0準備2
+		k,t,t,t,t,k,t,t,t,c,t,t,k,	// 1
+		k,t,t,t,t,k,b,t,t,t,t,t,k,	// 2
+		k,t,t,t,t,k,t,t,t,t,b,t,k,	// 3
+		k,t,t,t,t,k,t,t,t,t,t,t,k,	// 4
+		k,t,c,t,t,k,t,t,t,t,t,t,k,	// 5
+		k,t,b,t,t,k,c,t,t,t,t,t,k,	// 6
+		k,t,t,t,t,k,t,t,t,t,t,t,k,	// 7
+		k,t,t,t,t,k,t,t,t,t,t,t,k,	// 8	
+
+		//  0,1,2,3,4,5,6,7,8,9,0,1,2,
+		k,t,t,t,t,t,t,t,t,c,t,t,k,	// 0準備2
+		k,t,t,t,t,b,t,t,t,t,t,t,k,	// 1
+		k,k,k,k,t,t,k,k,k,k,k,k,k,	// 2
+		k,t,t,k,t,t,t,t,t,t,k,t,k,	// 3
+		k,t,t,t,t,t,t,t,t,c,t,t,k,	// 4
+		k,t,t,t,t,t,k,k,k,k,k,k,k,	// 5
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 8
+
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 0準備1
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
 		k,k,k,k,t,t,k,k,k,k,k,k,k,	// 2
-		k,t,t,t,t,t,t,t,t,t,b,t,k,	// 3
-		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 4
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
+		k,t,t,t,b,t,t,t,t,t,t,t,k,	// 4
 		k,t,c,t,t,t,t,t,t,t,t,t,k,	// 5
 		k,t,t,t,t,t,c,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
@@ -328,11 +350,11 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 0描画
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
-		k,k,k,k,t,t,k,k,k,k,k,k,k,	// 2
-		k,t,t,t,t,t,t,t,t,t,b,t,k,	// 3
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 2
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 4
-		k,t,c,t,t,t,t,t,t,t,t,t,k,	// 5
-		k,t,t,t,t,t,c,t,t,t,t,t,k,	// 6
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 5
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
 		k,k,k,k,k,k,k,k,k,k,k,k,k	// 8
 };
@@ -368,6 +390,10 @@ VOID MY_FONT_DELETE(VOID);
 VOID MY_START(VOID);
 VOID MY_START_PROC(VOID);	//スタート画面の処理
 VOID MY_START_DRAW(VOID);	//スタート画面の描画
+
+VOID MY_Explanation(VOID);
+VOID MY_Explanation_PROC(VOID);//ゲーム説明の処理
+VOID MY_Explanation_DRAW(VOID);//ゲーム画面の描画
 
 VOID MY_PLAY(VOID);
 VOID MY_PLAY_PROC(VOID);	//プレイ画面の処理
@@ -439,6 +465,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 		case GAME_SCENE_START:
 			MY_START();
+			break;
+		case GAME_SCENE_Explanation:
+			MY_Explanation();
 			break;
 		case GAME_SCENE_PLAY:
 			MY_PLAY();
@@ -705,7 +734,7 @@ VOID MY_START_PROC(VOID)
 		}
 
 
-		GameScene = GAME_SCENE_PLAY;
+		GameScene = GAME_SCENE_Explanation;
 
 		if (CheckSoundMem(BGM_TITLE.handle) != 0)
 		{
@@ -779,6 +808,36 @@ VOID MY_START_DRAW(VOID)
 	return;
 }
 
+VOID MY_Explanation(VOID)
+{
+	MY_Explanation_PROC();	//説明画面の処理
+	MY_Explanation_DRAW();	//説明画面の描画
+
+	return;
+}
+
+//説明画面の処理
+VOID MY_Explanation_PROC(VOID)
+{
+	//エスケープキーを押したら、プレイシーンへ移動する
+	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
+	{
+		GameScene = GAME_SCENE_PLAY;
+	}
+
+	return;
+}
+
+//説明画面の描画
+VOID MY_Explanation_DRAW(VOID)
+{
+	
+	DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(255, 0, 0), TRUE);
+
+	DrawString(0, 0, "スタート画面(エンターキーを押して下さい)", GetColor(255, 255, 255));
+	return;
+}
+
 //プレイ画面
 VOID MY_PLAY(VOID)
 {
@@ -792,7 +851,7 @@ VOID MY_PLAY(VOID)
 VOID MY_PLAY_PROC(VOID)
 {
 	//ESCキーを押したら、エンドシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
+	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
 		if (CheckSoundMem(BGM.handle) != 0)
 		{
