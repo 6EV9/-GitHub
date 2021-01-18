@@ -40,6 +40,7 @@
 
 #define IMAGE_BACK_PATH			TEXT(".\\IMAGE\\playBK.png")
 #define IMAGE_PLAYER_PATH		TEXT(".\\IMAGE\\play.png")
+#define IMAGE__SETUMEI_PATH      TEXT(".\\IMAGE\\setumei.png")
 
 #define IMAGE_TITLE_BK_PATH			TEXT(".\\IMAGE\\haikei1.png")		
 #define IMAGE_TITLE_ROGO_PATH		TEXT(".\\IMAGE\\ROGO2.png")	
@@ -311,7 +312,7 @@ IMAGE_BLINK ImageTitleSTART;
 
 IMAGE ImageBack;
 CHARA player;
-
+IMAGE ImageStumei;
 
 
 
@@ -831,8 +832,8 @@ VOID MY_Explanation_PROC(VOID)
 //説明画面の描画
 VOID MY_Explanation_DRAW(VOID)
 {
-	
-	DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(255, 0, 0), TRUE);
+	DrawGraph(ImageStumei.x, ImageStumei.y, ImageStumei.handle, TRUE);
+	/*DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(255, 0, 0), TRUE);*/
 
 	DrawString(0, 0, "スタート画面(エンターキーを押して下さい)", GetColor(255, 255, 255));
 	return;
@@ -872,7 +873,7 @@ VOID MY_PLAY_PROC(VOID)
 	
 		PlaySoundMem(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
-
+	//キー上
 	if (MY_KEY_DOWN(KEY_INPUT_UP))
 	{
 		player.CenterY -= CHARA_SPEED_MIDI;
@@ -884,7 +885,7 @@ VOID MY_PLAY_PROC(VOID)
 			player.CenterY += CHARA_SPEED_MIDI;
 		}
 	}
-
+	//キー下
 	if (MY_KEY_DOWN(KEY_INPUT_DOWN))
 	{
 		player.CenterY += CHARA_SPEED_MIDI;
@@ -896,7 +897,7 @@ VOID MY_PLAY_PROC(VOID)
 			player.CenterY -= CHARA_SPEED_MIDI;
 		}
 	}
-
+	//キー左
 	if (MY_KEY_DOWN(KEY_INPUT_LEFT))
 	{
 		player.CenterX -= CHARA_SPEED_MIDI;
@@ -907,7 +908,7 @@ VOID MY_PLAY_PROC(VOID)
 			player.CenterX += CHARA_SPEED_MIDI;
 		}
 	}
-
+	//キー右
 	if (MY_KEY_DOWN(KEY_INPUT_RIGHT))
 	{
 		player.CenterX += CHARA_SPEED_MIDI;
@@ -982,7 +983,7 @@ VOID MY_PLAY_PROC(VOID)
 
 
 
-
+	//ショット
 	if (player.CanShot == FALSE)
 	{
 
@@ -1039,19 +1040,19 @@ VOID MY_PLAY_DRAW(VOID)
 			//壁ならば
 			if (map[tate][yoko].kind == k)
 			{
-				DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, GetColor(0, 0, 255), FALSE);
+				/*DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom,FALSE);*/
 			}
 
 			//浮遊物
 			if (map[tate][yoko].kind == b)
 			{
-				DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, GetColor(255, 255, 255), FALSE);
+				//DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom,/* GetColor(255, 255, 255),*/ FALSE);
 			}
 
 			//通路ならば
 			if (map[tate][yoko].kind == t)
 			{
-				DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, GetColor(0, 255, 0), FALSE);
+				//DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, /*GetColor(0, 255, 0),*/ FALSE);
 			}
 		}
 	}
@@ -1067,11 +1068,11 @@ VOID MY_PLAY_DRAW(VOID)
 				TRUE);
 
 			//当たり判定
-			DrawBox(
-				player.tama[cnt].x,
-				player.tama[cnt].y,
-				player.tama[cnt].x + player.tama[cnt].width,
-				player.tama[cnt].y + player.tama[cnt].height, GetColor(0, 0, 255), FALSE);
+			//DrawBox(
+			//	player.tama[cnt].x,
+			//	player.tama[cnt].y,
+			//	player.tama[cnt].x + player.tama[cnt].width,
+			//	/*player.tama[cnt].y + player.tama[cnt].height, GetColor(0, 0, 255), FALSE);*/
 
 			if (player.tama[cnt].changeImageCnt < player.tama[cnt].changeImageCntMAX)
 			{
@@ -1105,7 +1106,7 @@ VOID MY_PLAY_DRAW(VOID)
 
 	//プレイヤー描画
 	DrawGraph(player.x, player.y, player.handle, TRUE);
-	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
+	/*DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);*/
 
 	//スコア
 	DrawFormatString(0, 0, GetColor(0, 0, 0), "スコア: %05d",score);
@@ -1125,24 +1126,25 @@ VOID MY_END(VOID)
 //エンド画面の処理
 VOID MY_END_PROC(VOID)
 {
-
-	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+	//スペースキーでスタート画面
+	/*if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 	{
 		SetMouseDispFlag(TRUE);
 
 		GameScene = GAME_SCENE_START;
-	}
+	}*/
 
 	return;
 }
 
-//エンド画面処理
+//エンド画面描画
 VOID MY_END_DRAW(VOID)
 {
 
 	DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(0, 0, 255), TRUE);
-
-	DrawString(0, 0, "エンド画面(スペースキーを押して下さい)", GetColor(255, 255, 255));
+	//スコア
+	DrawFormatString(350, 300, GetColor(0, 0, 0), "スコア: %05d", score);
+	/*DrawString(0, 0, "エンド画面(スペースキーを押して下さい)", GetColor(255, 255, 255));*/
 
 	return;
 }
@@ -1200,6 +1202,18 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleSTART.IsDraw = FALSE;
 
 
+	strcpy_s(ImageStumei.path, IMAGE__SETUMEI_PATH);
+	ImageStumei.handle = LoadGraph(ImageStumei.path);
+	if (ImageStumei.handle == -1)
+	{
+
+		MessageBox(GetMainWindowHandle(), IMAGE__SETUMEI_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageStumei.handle, &ImageStumei.width, &ImageStumei.height);
+	ImageStumei.x = GAME_WIDTH / 10 - ImageStumei.width / 10;
+	ImageStumei.y = GAME_HEIGHT / 10 - ImageStumei.height / 10;
+
 	strcpy_s(ImageBack.path, IMAGE_BACK_PATH);
 	ImageBack.handle = LoadGraph(ImageBack.path);
 	if (ImageBack.handle == -1)
@@ -1211,8 +1225,6 @@ BOOL MY_LOAD_IMAGE(VOID)
 	GetGraphSize(ImageBack.handle, &ImageBack.width, &ImageBack.height);
 	ImageBack.x = GAME_WIDTH / 2 - ImageBack.width / 2;
 	ImageBack.y = GAME_HEIGHT / 2 - ImageBack.height / 2;
-
-
 	strcpy_s(player.path, IMAGE_PLAYER_PATH);
 	player.handle = LoadGraph(player.path);
 	if (player.handle == -1)
@@ -1465,7 +1477,7 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(player.handle);
 
 
-
+	DeleteGraph(ImageStumei.handle);
 	DeleteGraph(ImageTitleBK.handle);
 	DeleteGraph(ImageTitleROGO.image.handle);
 	DeleteGraph(ImageTitleSTART.image.handle);
