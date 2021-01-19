@@ -349,7 +349,7 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 8
 
-		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 0描画
+		k,t,t,t,t,t,b,t,t,t,t,t,k,	// 0描画
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 2
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
@@ -835,7 +835,7 @@ VOID MY_Explanation_DRAW(VOID)
 	DrawGraph(ImageStumei.x, ImageStumei.y, ImageStumei.handle, TRUE);
 	/*DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(255, 0, 0), TRUE);*/
 
-	DrawString(0, 0, "スタート画面(エンターキーを押して下さい)", GetColor(255, 255, 255));
+	DrawString(0, 0, "スタート画面(エスケープキーを押して下さい)", GetColor(255, 255, 255));
 	return;
 }
 
@@ -852,18 +852,18 @@ VOID MY_PLAY(VOID)
 VOID MY_PLAY_PROC(VOID)
 {
 	//ESCキーを押したら、エンドシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
-	{
-		if (CheckSoundMem(BGM.handle) != 0)
-		{
-			StopSoundMem(BGM.handle);
-		}
+	//if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
+	//{
+	//	if (CheckSoundMem(BGM.handle) != 0)
+	//	{
+	//		StopSoundMem(BGM.handle);
+	//	}
 
-		SetMouseDispFlag(TRUE);
+	//	SetMouseDispFlag(TRUE);
 
-		GameScene = GAME_SCENE_END;
-		return;
-	}
+	//	GameScene = GAME_SCENE_END;
+	//	return;
+	//}
 
 	if (CheckSoundMem(BGM.handle) == 0)
 	{
