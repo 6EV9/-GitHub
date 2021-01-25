@@ -40,7 +40,8 @@
 
 #define IMAGE_BACK_PATH			TEXT(".\\IMAGE\\playBK.png")
 #define IMAGE_PLAYER_PATH		TEXT(".\\IMAGE\\play.png")
-#define IMAGE__SETUMEI_PATH      TEXT(".\\IMAGE\\setumei.png")
+#define IMAGE_SETUMEI_PATH      TEXT(".\\IMAGE\\setumei.png")
+#define IMAGE_END_PATH		TEXT(".\\IMAGE\\END.png")
 
 #define IMAGE_TITLE_BK_PATH			TEXT(".\\IMAGE\\haikei1.png")		
 #define IMAGE_TITLE_ROGO_PATH		TEXT(".\\IMAGE\\ROGO2.png")	
@@ -310,9 +311,11 @@ IMAGE_ROTA ImageTitleROGO;
 IMAGE_BLINK ImageTitleSTART;
 
 
+
 IMAGE ImageBack;
 CHARA player;
 IMAGE ImageStumei;
+IMAGE END;
 
 
 
@@ -737,10 +740,7 @@ VOID MY_START_PROC(VOID)
 
 		GameScene = GAME_SCENE_Explanation;
 
-		if (CheckSoundMem(BGM_TITLE.handle) != 0)
-		{
-			StopSoundMem(BGM_TITLE.handle);	//BGMを止める
-		}
+	
 
 
 		return;
@@ -823,6 +823,10 @@ VOID MY_Explanation_PROC(VOID)
 	//エスケープキーを押したら、プレイシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
 	{
+		if (CheckSoundMem(BGM_TITLE.handle) != 0)
+		{
+			StopSoundMem(BGM_TITLE.handle);	//BGMを止める
+		}
 		GameScene = GAME_SCENE_PLAY;
 	}
 
@@ -1140,10 +1144,10 @@ VOID MY_END_PROC(VOID)
 //エンド画面描画
 VOID MY_END_DRAW(VOID)
 {
-
-	DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(0, 0, 255), TRUE);
+	DrawGraph(END.x, END.y, END.handle, TRUE);
+	//DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(0, 0, 255), TRUE);
 	//スコア
-	DrawFormatString(350, 300, GetColor(0, 0, 0), "スコア: %05d", score);
+	DrawFormatString(350, 315, GetColor(0, 0, 0), ": %05d", score);
 	/*DrawString(0, 0, "エンド画面(スペースキーを押して下さい)", GetColor(255, 255, 255));*/
 
 	return;
@@ -1153,6 +1157,17 @@ VOID MY_END_DRAW(VOID)
 BOOL MY_LOAD_IMAGE(VOID)
 {
 
+	strcpy_s(END.path, IMAGE_END_PATH);
+	END.handle = LoadGraph(END.path);
+	if (ImageTitleBK.handle == -1)
+	{
+
+		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_BK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(END.handle, &END.width, &END.height);
+	END.x = GAME_WIDTH / 2 - END.width / 2;
+	END.y = GAME_HEIGHT / 2 - END.height / 2;
 
 
 
@@ -1202,12 +1217,12 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleSTART.IsDraw = FALSE;
 
 
-	strcpy_s(ImageStumei.path, IMAGE__SETUMEI_PATH);
+	strcpy_s(ImageStumei.path, IMAGE_SETUMEI_PATH);
 	ImageStumei.handle = LoadGraph(ImageStumei.path);
 	if (ImageStumei.handle == -1)
 	{
 
-		MessageBox(GetMainWindowHandle(), IMAGE__SETUMEI_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		MessageBox(GetMainWindowHandle(), IMAGE_SETUMEI_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
 	GetGraphSize(ImageStumei.handle, &ImageStumei.width, &ImageStumei.height);
@@ -1476,7 +1491,7 @@ VOID MY_DELETE_IMAGE(VOID)
 
 	DeleteGraph(player.handle);
 
-
+	DeleteGraph(END.handle);
 	DeleteGraph(ImageStumei.handle);
 	DeleteGraph(ImageTitleBK.handle);
 	DeleteGraph(ImageTitleROGO.image.handle);
