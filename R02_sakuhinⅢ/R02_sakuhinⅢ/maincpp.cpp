@@ -2,7 +2,7 @@
 
 #define IDI_ICON1 333
 
-#define GAME_MAP_TATE_MAX	9	
+#define GAME_MAP_TATE_MAX	10	
 #define GAME_MAP_YOKO_MAX	13	
 #define GAME_MAP_KIND_MAX	2	
 
@@ -55,7 +55,7 @@
 #define MUSIC_LOAD_ERR_TITLE TEXT("âπäyì«Ç›çûÇ›ÉGÉâÅ[")
 
 #define MUSIC_BGM_PATH TEXT(".\\MUSIC\\BGMpaly.mp3")
-#define MUSIC_PLAYER_SHOT_PATH	TEXT(".\\MUSIC\\SHOT.mp3")
+#define MUSIC_PLAYER_SHOT_PATH	TEXT(".\\MUSIC\\SHOT2.mp3")
 #define MUSIC_BGM_TITLE_PATH		TEXT(".\\MUSIC\\BGMSTR.mp3")
 
 #define TAMA_CHANGE_MAX 5
@@ -97,7 +97,7 @@
 
 #define TAMA_DIV_NUM	TAMA_DIV_TATE * TAMA_DIV_YOKO
 
-#define GAME_MAP_TATE_MAX	(9 * 6)	
+#define GAME_MAP_TATE_MAX	(12 * 6)	
 #define GAME_MAP_YOKO_MAX	13	
 #define GAME_MAP_KIND_MAX	2	
 
@@ -320,6 +320,17 @@ IMAGE END;
 
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
+	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
+		k,b,b,b,b,k,k,k,k,t,t,t,k,	// 0èÄîı3
+		k,t,t,t,t,k,t,t,k,c,t,t,k,	// 1
+		k,t,t,t,t,k,b,t,k,t,t,t,k,	// 2
+		k,t,t,t,t,k,t,t,k,t,b,t,k,	// 3
+		k,t,t,t,t,k,b,b,k,k,k,c,k,	// 4
+		k,t,c,t,t,t,t,t,t,t,t,t,k,	// 5
+		k,t,b,t,t,k,c,t,k,k,k,k,k,	// 6
+		k,t,t,t,t,k,t,t,t,t,t,t,k,	// 7
+		k,t,t,t,t,k,k,k,k,t,t,t,k,	// 8	
+
 	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
 		k,k,k,k,k,k,t,t,t,t,t,t,k,	// 0èÄîı2
 		k,t,t,t,t,k,t,t,t,c,t,t,k,	// 1
