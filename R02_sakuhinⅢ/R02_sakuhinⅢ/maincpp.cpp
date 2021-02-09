@@ -57,6 +57,8 @@
 #define MUSIC_BGM_PATH TEXT(".\\MUSIC\\BGMpaly.mp3")
 #define MUSIC_PLAYER_SHOT_PATH	TEXT(".\\MUSIC\\SHOT2.mp3")
 #define MUSIC_BGM_TITLE_PATH		TEXT(".\\MUSIC\\BGMSTR.mp3")
+#define MUSIC_ENDBGM_PATH TEXT(".\\MUSIC\\ENDBGM.mp3")
+
 
 #define TAMA_CHANGE_MAX 5
 #define TAMA_MAX       16
@@ -97,7 +99,7 @@
 
 #define TAMA_DIV_NUM	TAMA_DIV_TATE * TAMA_DIV_YOKO
 
-#define GAME_MAP_TATE_MAX	(12 * 6)	
+#define GAME_MAP_TATE_MAX	(13 *7)	
 #define GAME_MAP_YOKO_MAX	13	
 #define GAME_MAP_KIND_MAX	2	
 
@@ -127,9 +129,10 @@ enum GAME_MAP_KIND
 	k3 = 13,//壁
 	b = 14,//浮遊物
 	c = 17,
-	c1 = 18,
+	C = 18,
+	N = 19,
 
-	t = 18,	//通路
+	t = 20,	//通路
 	s = 32,	//スタート
 	g = 3	//ゴール
 };
@@ -305,6 +308,7 @@ int PlayerGraph;
 
 MUSIC BGM;
 MUSIC BGM_TITLE;//タイトルBGM
+MUSIC END_BGM;//ENDBGM
 
 IMAGE ImageTitleBK;
 IMAGE_ROTA ImageTitleROGO;
@@ -320,6 +324,17 @@ IMAGE END;
 
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
+	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
+		k,k,k,k,k,k,C,k,k,k,k,k,k,	// 0準備4
+		k,k,k,k,k,k,t,k,k,k,k,k,k,	// 1
+		k,k,k,k,k,t,t,t,k,k,k,k,k,	// 2
+		k,k,k,k,t,t,t,t,t,k,k,k,k,	// 3
+		k,k,k,t,t,k,k,t,t,t,k,k,k,	// 4
+		k,t,t,t,k,k,k,k,t,t,t,t,k,	// 5
+		k,t,t,t,k,k,k,k,t,t,t,t,k,	// 6
+		k,t,t,t,k,k,k,k,t,t,t,t,k,	// 7
+		k,t,t,t,k,k,k,k,t,t,t,k,k,	// 8	
+
 	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
 		k,b,b,b,b,k,k,k,k,t,t,t,k,	// 0準備3
 		k,t,t,t,t,k,t,t,k,c,t,t,k,	// 1
@@ -365,8 +380,8 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 
 		k,t,t,t,t,t,b,t,t,t,t,t,k,	// 0描画
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
-		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 2
-		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
+		k,t,t,t,t,t,N,t,t,t,t,t,k,	// 2
+		k,t,C,t,t,t,t,t,t,t,t,t,k,	// 3
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 4
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 5
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
@@ -1149,6 +1164,14 @@ VOID MY_END_PROC(VOID)
 		GameScene = GAME_SCENE_START;
 	}*/
 
+	if (CheckSoundMem(END_BGM.handle) == 0)
+	{
+
+		ChangeVolumeSoundMem(255 * 50 / 100, END_BGM.handle);
+
+
+		PlaySoundMem(END_BGM.handle, DX_PLAYTYPE_LOOP);
+	}
 	return;
 }
 
@@ -1434,7 +1457,38 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 
 					return FALSE;
 				}
+				if (map[tate][yoko].kind == C) {
 
+
+					if (MY_CHECK_RECT_COLL(player, mapColl[tate][yoko]) == TRUE)
+					{
+						//コイン当たり判定
+						if (map[tate][yoko].kind == C)
+						{
+							map[tate][yoko].kind = t;
+							score += 500;//スコア
+						}
+
+					}
+
+					return FALSE;
+				}
+				if (map[tate][yoko].kind == N) {
+
+
+					if (MY_CHECK_RECT_COLL(player, mapColl[tate][yoko]) == TRUE)
+					{
+						//コイン当たり判定
+						if (map[tate][yoko].kind == N)
+						{
+							map[tate][yoko].kind = t;
+							score -= 100;//スコア
+						}
+
+					}
+
+					return FALSE;
+				}
 
 
 			}
@@ -1545,7 +1599,29 @@ BOOL MY_LOAD_MUSIC(VOID)
 		MessageBox(GetMainWindowHandle(), MUSIC_BGM_TITLE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
+
+	//ENDBGM
+	strcpy_s(END_BGM.path, MUSIC_ENDBGM_PATH);
+	END_BGM.handle = LoadSoundMem(END_BGM.path);
+	if (END_BGM.handle == -1)
+	{
+
+		MessageBox(GetMainWindowHandle(), MUSIC_ENDBGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	//ショットGBM
+	strcpy_s(player.musicShot.path, MUSIC_PLAYER_SHOT_PATH);
+	player.musicShot.handle = LoadSoundMem(player.musicShot.path);
+	if (player.musicShot.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), MUSIC_PLAYER_SHOT_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
 	return TRUE;
+
+
 }
 
 //音楽をまとめて削除する関数
@@ -1553,6 +1629,7 @@ VOID MY_DELETE_MUSIC(VOID)
 {
 	DeleteSoundMem(BGM.handle);
 	DeleteSoundMem(player.musicShot.handle);
+	DeleteSoundMem(END_BGM.handle);
 
 	DeleteSoundMem(BGM_TITLE.handle);//タイトルBGM
 
