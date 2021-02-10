@@ -325,12 +325,12 @@ IMAGE END;
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
-		k,k,k,k,k,k,C,k,k,k,k,k,k,	// 0èÄîı4
-		k,k,k,k,k,k,t,k,k,k,k,k,k,	// 1
+		k,k,k,k,k,k,k,k,k,k,k,k,k,	// 0èÄîı4
+		k,k,k,k,k,k,C,k,k,k,k,k,k,	// 1
 		k,k,k,k,k,t,t,t,k,k,k,k,k,	// 2
 		k,k,k,k,t,t,t,t,t,k,k,k,k,	// 3
-		k,k,k,t,t,k,k,t,t,t,k,k,k,	// 4
-		k,t,t,t,k,k,k,k,t,t,t,t,k,	// 5
+		k,k,k,t,t,k,t,t,t,t,k,k,k,	// 4
+		k,t,t,t,k,k,k,t,t,t,t,t,k,	// 5
 		k,t,t,t,k,k,k,k,t,t,t,t,k,	// 6
 		k,t,t,t,k,k,k,k,t,t,t,t,k,	// 7
 		k,t,t,t,k,k,k,k,t,t,t,k,k,	// 8	
@@ -339,19 +339,19 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 		k,b,b,b,b,k,k,k,k,t,t,t,k,	// 0èÄîı3
 		k,t,t,t,t,k,t,t,k,c,t,t,k,	// 1
 		k,t,t,t,t,k,b,t,k,t,t,t,k,	// 2
-		k,t,t,t,t,k,t,t,k,t,b,t,k,	// 3
-		k,t,t,t,t,k,b,b,k,k,k,c,k,	// 4
+		k,t,t,t,t,k,t,t,k,C,b,t,k,	// 3
+		k,t,t,t,t,k,b,b,k,k,t,c,k,	// 4
 		k,t,c,t,t,t,t,t,t,t,t,t,k,	// 5
-		k,t,b,t,t,k,c,t,k,k,k,k,k,	// 6
+		k,t,b,t,t,t,c,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,k,t,t,t,t,t,t,k,	// 7
-		k,t,t,t,t,k,k,k,k,t,t,t,k,	// 8	
+		k,t,t,t,t,k,k,t,t,t,t,t,k,	// 8	
 
 	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
 		k,k,k,k,k,k,t,t,t,t,t,t,k,	// 0èÄîı2
 		k,t,t,t,t,k,t,t,t,c,t,t,k,	// 1
 		k,t,t,t,t,k,b,t,t,t,t,t,k,	// 2
 		k,t,t,t,t,k,t,t,t,t,b,t,k,	// 3
-		k,t,t,t,t,k,t,t,t,t,t,t,k,	// 4
+		k,t,t,t,t,k,t,t,t,N,t,t,k,	// 4
 		k,t,c,t,t,k,t,t,t,t,t,t,k,	// 5
 		k,t,b,t,t,k,c,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,k,t,t,t,t,t,t,k,	// 7
@@ -359,11 +359,11 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 
 		//  0,1,2,3,4,5,6,7,8,9,0,1,2,
 		k,t,t,t,t,t,t,t,t,c,t,t,k,	// 0èÄîı2
-		k,t,t,t,t,b,t,t,t,t,t,t,k,	// 1
+		k,t,t,t,t,b,c,t,t,t,t,t,k,	// 1
 		k,k,k,k,t,t,k,k,k,k,k,k,k,	// 2
 		k,t,t,k,t,t,t,t,t,t,k,t,k,	// 3
-		k,t,t,t,t,t,t,t,t,c,t,t,k,	// 4
-		k,t,t,t,t,t,k,k,k,k,k,k,k,	// 5
+		k,t,c,t,t,t,t,t,t,c,t,t,k,	// 4
+		k,t,t,t,N,t,k,k,k,k,k,k,k,	// 5
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 8
@@ -372,16 +372,16 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
 		k,k,k,k,t,t,k,k,k,k,k,k,k,	// 2
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
-		k,t,t,t,b,t,t,t,t,t,t,t,k,	// 4
-		k,t,c,t,t,t,t,t,t,t,t,t,k,	// 5
-		k,t,t,t,t,t,c,t,t,t,t,t,k,	// 6
+		k,t,t,t,t,t,t,c,t,t,t,t,k,	// 4
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 5
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 7
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 8
 
 		k,t,t,t,t,t,b,t,t,t,t,t,k,	// 0ï`âÊ
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 1
-		k,t,t,t,t,t,N,t,t,t,t,t,k,	// 2
-		k,t,C,t,t,t,t,t,t,t,t,t,k,	// 3
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 2
+		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 3
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 4
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 5
 		k,t,t,t,t,t,t,t,t,t,t,t,k,	// 6
